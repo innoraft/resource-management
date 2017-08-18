@@ -1,0 +1,7 @@
+uuid: 00f1ed90-1d93-4afe-8dd4-94dedc9cd3bc
+langcode: en
+status: true
+dependencies: {  }
+id: specification
+label: specification
+behavior_plugins: {  }

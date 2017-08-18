@@ -1,0 +1,28 @@
+uuid: b6938b3c-a65f-408c-86af-eddd127eedcd
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_specification
+    - paragraphs.paragraphs_type.specification
+    - taxonomy.vocabulary.specification
+id: paragraph.specification.field_specification
+field_name: field_specification
+entity_type: paragraph
+bundle: specification
+label: specification
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      specification: specification
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

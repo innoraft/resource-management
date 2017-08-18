@@ -1,0 +1,9 @@
+uuid: 5f496442-ee4f-4a88-93e8-794cf75d5776
+langcode: en
+status: true
+dependencies: {  }
+name: specification
+vid: specification
+description: 'It is a vocabulary for categories.'
+hierarchy: 0
+weight: 0

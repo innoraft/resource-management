@@ -1,0 +1,25 @@
+uuid: 806907cd-1e0f-4305-9e3f-93623264441c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.specification.field_specification
+    - paragraphs.paragraphs_type.specification
+id: paragraph.specification.default
+targetEntityType: paragraph
+bundle: specification
+mode: default
+content:
+  field_specification:
+    weight: 0
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+hidden:
+  created: true
+  status: true
+  uid: true
