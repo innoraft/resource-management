@@ -20,13 +20,17 @@ bundle: user
 mode: default
 content:
   account:
-    weight: -10
+    weight: 3
     region: content
+    settings: {  }
+    third_party_settings: {  }
   contact:
-    weight: 5
+    weight: 6
     region: content
+    settings: {  }
+    third_party_settings: {  }
   field_first_name:
-    weight: 10
+    weight: 0
     settings:
       size: 60
       placeholder: ''
@@ -34,7 +38,7 @@ content:
     type: string_textfield
     region: content
   field_last_name:
-    weight: 9
+    weight: 1
     settings:
       size: 60
       placeholder: ''
@@ -43,7 +47,7 @@ content:
     region: content
   field_specification:
     type: entity_reference_paragraphs
-    weight: 7
+    weight: 2
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -54,17 +58,21 @@ content:
     third_party_settings: {  }
     region: content
   language:
-    weight: 0
+    weight: 5
     region: content
+    settings: {  }
+    third_party_settings: {  }
   timezone:
-    weight: 6
+    weight: 7
     region: content
+    settings: {  }
+    third_party_settings: {  }
   user_picture:
     type: image_image
     settings:
       progress_indicator: throbber
       preview_image_style: thumbnail
     third_party_settings: {  }
-    weight: -1
+    weight: 4
     region: content
 hidden: {  }
