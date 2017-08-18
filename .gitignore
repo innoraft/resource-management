@@ -54,3 +54,5 @@ docker/*
 
 #Ignore .DS_Store
 *.DS_Store
+
+docroot/sites/default/settings.local.php
