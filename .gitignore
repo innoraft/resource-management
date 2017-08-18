@@ -1,36 +1,56 @@
+# This file contains default .gitignore rules. To use it, copy it to .gitignore,
+# and it will cause files like your settings.php and user-uploaded files to be
+# excluded from Git version control. This is a common strategy to avoid
+# accidentally including private information in public repositories and patch
+# files.
+#
+# Because .gitignore can be specific to your site, this file has a different
+# name; updating Drupal core will not override your custom .gitignore file.
+
+# Ignore core when managing all of a project's dependencies with Composer
+# including Drupal core.
+# core
+
+# Core's dependencies are managed with Composer.
+docroot/vendor
+
 # Ignore configuration files that may contain sensitive information.
-sites/*/*settings*.php
+docroot/sites/*/settings.local.php
+docroot/sites/*/services*.yml
 
-# Ignore paths that contain generated content.
-files/
-sites/*/files
-sites/*/private
+# Ignore paths that contain user-generated content.
+docroot/sites/*/files
+docroot/sites/*/private
 
-# Ignore default text files
-robots.txt
-/CHANGELOG.txt
-/COPYRIGHT.txt
-/INSTALL*.txt
-/LICENSE.txt
-/MAINTAINERS.txt
-/UPGRADE.txt
-/README.txt
-sites/README.txt
-sites/all/modules/README.txt
-sites/all/themes/README.txt
+# Ignore SimpleTest multi-site environment.
+docroot/sites/simpletest
 
-# Ignore everything but the "sites" folder ( for non core developer )
-.htaccess
-web.config
-authorize.php
-cron.php
-index.php
-install.php
-update.php
-xmlrpc.php
-/includes
-/misc
-/modules
-/profiles
-/scripts
-/themes
+# If you prefer to store your .gitignore file in the sites/ folder, comment
+# or delete the previous settings and uncomment the following ones, instead.
+
+# Ignore configuration files that may contain sensitive information.
+#*/settings*.php
+
+# Ignore paths that contain user-generated content.
+*/files
+*/private
+
+# Ignore SimpleTest multi-site environment.
+simpletest
+
+# Ignore syslog files
+docroot/*.log
+#sass cache
+docroot/themes/*/.sass-cache/*
+# Ignore sass cache files
+*.sass-cache
+
+# Ignore css & map file in sass folder
+*/sass/*.css
+*/sass/*.css.map
+
+# Ignore docker files
+docker/*
+
+#Ignore .DS_Store
+*.DS_Store
