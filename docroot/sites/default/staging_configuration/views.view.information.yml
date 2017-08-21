@@ -80,7 +80,7 @@ display:
           group_type: group
           admin_label: ''
           label: 'First Name'
-          exclude: false
+          exclude: true
           alter:
             alter_text: false
             text: ''
@@ -142,11 +142,11 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Last Name'
+          label: Name
           exclude: false
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: '{{ field_first_name }} {{field_last_name }}'
             make_link: false
             path: ''
             absolute: false
@@ -377,18 +377,39 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
-          is_grouped: false
+          is_grouped: true
           group_info:
-            label: ''
+            label: Specification
             description: ''
-            identifier: ''
+            identifier: field_specification_target_id
             optional: true
             widget: select
             multiple: false
             remember: false
             default_group: All
             default_group_multiple: {  }
-            group_items: {  }
+            group_items:
+              1:
+                title: ''
+                operator: '='
+                value:
+                  value: ''
+                  min: ''
+                  max: ''
+              2:
+                title: ''
+                operator: '='
+                value:
+                  value: ''
+                  min: ''
+                  max: ''
+              3:
+                title: ''
+                operator: '='
+                value:
+                  value: ''
+                  min: ''
+                  max: ''
           plugin_id: numeric
       sorts:
         created:
