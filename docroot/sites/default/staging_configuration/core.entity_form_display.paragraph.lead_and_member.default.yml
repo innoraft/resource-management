@@ -1,0 +1,44 @@
+uuid: f1324262-9d34-42a5-983e-b1f1d367d85b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.lead_and_member.field_lead
+    - field.field.paragraph.lead_and_member.field_member
+    - field.field.paragraph.lead_and_member.field_project_name
+    - paragraphs.paragraphs_type.lead_and_member
+id: paragraph.lead_and_member.default
+targetEntityType: paragraph
+bundle: lead_and_member
+mode: default
+content:
+  field_lead:
+    weight: 1
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_member:
+    weight: 2
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_project_name:
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+hidden:
+  created: true
+  status: true
+  uid: true

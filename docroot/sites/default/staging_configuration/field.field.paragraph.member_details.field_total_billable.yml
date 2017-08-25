@@ -1,0 +1,25 @@
+uuid: ebc01d81-62aa-4dc6-b55a-d5aa49d886bd
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_total_billable
+    - paragraphs.paragraphs_type.member_details
+id: paragraph.member_details.field_total_billable
+field_name: field_total_billable
+entity_type: paragraph
+bundle: member_details
+label: 'Total billable'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: !!float 0
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: Rs.
+  suffix: ''
+field_type: decimal
