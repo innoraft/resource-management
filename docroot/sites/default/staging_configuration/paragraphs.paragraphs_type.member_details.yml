@@ -1,0 +1,7 @@
+uuid: 2606595e-2ce2-463b-8b28-fd0471e45d27
+langcode: en
+status: true
+dependencies: {  }
+id: member_details
+label: 'Member Details'
+behavior_plugins: {  }

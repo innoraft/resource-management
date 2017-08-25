@@ -1,0 +1,36 @@
+uuid: 6eace552-445a-46ef-b6fb-b9e0acdf9e75
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_member_details
+    - node.type.project
+    - paragraphs.paragraphs_type.member_details
+  module:
+    - entity_reference_revisions
+id: node.project.field_member_details
+field_name: field_member_details
+entity_type: node
+bundle: project
+label: 'Member Details'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      member_details: member_details
+    target_bundles_drag_drop:
+      lead_and_member:
+        weight: 4
+        enabled: false
+      member_details:
+        enabled: true
+        weight: 5
+      specification:
+        weight: 6
+        enabled: false
+field_type: entity_reference_revisions

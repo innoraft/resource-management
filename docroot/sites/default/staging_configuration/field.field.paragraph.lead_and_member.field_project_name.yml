@@ -1,0 +1,19 @@
+uuid: 3468425b-24ef-44d0-a27f-808ec7892fa9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_project_name
+    - paragraphs.paragraphs_type.lead_and_member
+id: paragraph.lead_and_member.field_project_name
+field_name: field_project_name
+entity_type: paragraph
+bundle: lead_and_member
+label: 'Project Name'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
