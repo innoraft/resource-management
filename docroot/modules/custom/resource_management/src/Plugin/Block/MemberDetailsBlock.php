@@ -1,10 +1,6 @@
 <?php
-/**
- * @file
- * Contains \Drupal\form_block\Plugin\Block\MemberDetailsBlock.
- */
 
-namespace Drupal\form_block\Plugin\Block;
+namespace Drupal\resource_management\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormInterface;
@@ -25,7 +21,7 @@ class MemberDetailsBlock extends BlockBase {
    */
   public function build() {
 
-    $form = \Drupal::formBuilder()->getForm('Drupal\form_block\Form\MemberDetailsForm');
+    $form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\MemberDetailsForm');
 
     return $form;
    }
