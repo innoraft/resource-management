@@ -47,14 +47,6 @@ class MemberDetailsForm extends FormBase {
       '#title' => $this->t('User Name'),
     );
 
-    // $form['specification'] = array(
-    //   // '#type' => 'checkbox_tree',
-    //   '#type' => 'entity_autocomplete',
-    //   '#target_type' => 'taxonomy_term',
-    //   // '#vocabulary' => taxonomy_vocabulary_load(1),
-    //   '#title' => $this->t('Specialization'),
-    // );
-
     $form['time_duration'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Time Duration'),
@@ -77,12 +69,6 @@ class MemberDetailsForm extends FormBase {
       '#button_type' => 'primary',
     );
     return $form;
-  }
-
-  public function get_name($id){
-    $user = \Drupal\user\Entity\User::load($id);
-    $name = $user->getUsername();
-    return $name;
   }
 
   /**
