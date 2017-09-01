@@ -1,0 +1,16 @@
+user.info:
+  path: '/user_project_info/{uId}'
+  defaults:
+    _controller: '\Drupal\resource_management\Controller\UserProjectInfo::content'
+    _title: 'User Project Information'
+  requirements:
+    _permission: 'access content'
+
+
+member_details.block:
+  path: '/user_project_info/{uId}/block'
+  defaults:
+    _controller: '\Drupal\resource_management\Controller\UserProjectInfo::block'
+    _title: 'Form block'
+  requirements:
+    _permission: 'access content'
