@@ -7,10 +7,9 @@ user.info:
     _permission: 'access content'
 
 
-member_details.block:
-  path: '/user_project_info/{uId}/block'
+user.data_entry:
+  path: '/user_project_info/{$uId}/form'
   defaults:
-    _controller: '\Drupal\resource_management\Controller\UserProjectInfo::block'
-    _title: 'Form block'
+    _form: '\Drupal\resource_management\Form\MemberDetailsForm'
   requirements:
     _permission: 'access content'

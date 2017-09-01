@@ -20,6 +20,6 @@ default_value_callback: ''
 settings:
   min: null
   max: null
-  prefix: Rs.
-  suffix: ''
+  prefix: ''
+  suffix: '%'
 field_type: decimal

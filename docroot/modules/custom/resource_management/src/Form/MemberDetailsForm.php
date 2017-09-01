@@ -26,18 +26,21 @@ class MemberDetailsForm extends FormBase {
     $form['project_name'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Project Name'),
+      '#required' => 'true'
     );
 
     $form['lead'] = array(
       '#type' => 'entity_autocomplete',
       '#target_type' => 'user',
       '#title' => $this->t('Lead'),
+      '#required' => 'true'
     );
 
     $form['member'] = array(
       '#type' => 'entity_autocomplete',
       '#target_type' => 'user',
       '#title' => $this->t('Member'),
+      '#required' => 'true'
     );
 
     $form['user_name'] = array(
@@ -45,6 +48,7 @@ class MemberDetailsForm extends FormBase {
       '#target_type' => 'user',
       '#cardinality' => '3',
       '#title' => $this->t('User Name'),
+      '#required' => 'true'
     );
 
     $form['time_duration'] = array(
@@ -55,6 +59,12 @@ class MemberDetailsForm extends FormBase {
     $form['percentage_time'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Percentage of member\'s time'),
+    );
+
+    $form['field_billable'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Billable'),
+      '#required' => 'true'
     );
 
     $form['non_billable'] = array(
@@ -90,7 +100,7 @@ class MemberDetailsForm extends FormBase {
         'target_id' => $paragraph_lead_and_member->id(),
         'target_revision_id' => $paragraph_lead_and_member->getRevisionId(),
       ),
-      'field_total_billable' => 20,
+      'field_total_billable' => $form_state->getValue('field_billable'),
       'field_total_non_billable' => 0,
       'field_user_name' => array('target_id' => $form_state->getValue('user_name')),
     ]);
@@ -108,7 +118,10 @@ class MemberDetailsForm extends FormBase {
     );
     $entity = Node::create($nodeData);
     $entity->save();
+
     drupal_set_message("Success",'status');
+    kint($this->redirect('user.info',['uId' => '2']));
+    return $this->redirect('user.info',['uId' => '2']);
   }
 
 

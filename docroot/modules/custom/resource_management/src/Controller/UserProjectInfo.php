@@ -4,7 +4,7 @@ namespace Drupal\resource_management\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\paragraphs\Entity\Paragraph;
-
+use Drupal\Core\Url;
 /**
  * {@inheritdoc}
  */
@@ -68,12 +68,31 @@ class UserProjectInfo extends ControllerBase{
 		// var_dump($total_non_billable);
 		$total = $total_billable + $total_non_billable;
 
+
+		$link_options = array(
+			'type' => 'link',
+			'title' => $this->t('Add More Information'),
+			// '#url' => \Drupal\Core\Url::fromRoute('user.info'),
+			'attributes' => [
+				'class' => ['use-ajax'],
+				'data-dialog-type' => 'modal',
+				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode([
+						'width:700',
+				]),
+			],
+		);
+
+		$url = Url::fromRoute('user.data_entry',['uId'=>'2']);
+		$url->setOptions($link_options);
+		$link = \Drupal\Core\Link::fromTextAndUrl($link_options['title'], $url )->toString();
+
 		$markup = 
 		"<div>Name : ".$name."</div>
 		<div>Specialization : ".$specialization_vals."</div>
 		<div>Total billable : ".$total_billable."</div>
 		<div>Total non-billable : ".$total_non_billable."</div>
-		<div>Total : ".$total."</div>";
+		<div>Total : ".$total."</div>
+		<div>".$link."</div>";
 		
 
 		$build = array(
