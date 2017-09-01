@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.member_details.field_lead_and_member
-    - field.field.paragraph.member_details.field_spe
     - field.field.paragraph.member_details.field_total_billable
     - field.field.paragraph.member_details.field_total_non_billable
     - field.field.paragraph.member_details.field_user_name
@@ -18,7 +17,7 @@ mode: default
 content:
   field_lead_and_member:
     type: entity_reference_paragraphs
-    weight: 4
+    weight: 0
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -27,15 +26,6 @@ content:
       form_display_mode: default
       default_paragraph_type: ''
     third_party_settings: {  }
-    region: content
-  field_spe:
-    weight: 1
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete
     region: content
   field_total_billable:
     weight: 2
@@ -52,7 +42,7 @@ content:
     type: number
     region: content
   field_user_name:
-    weight: 0
+    weight: 1
     settings:
       match_operator: CONTAINS
       size: 60
