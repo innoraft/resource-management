@@ -9,6 +9,8 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
 use Drupal\paragraphs\Entity\Paragraph;
+use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class MemberDetailsForm extends FormBase {
   /**
@@ -119,9 +121,7 @@ class MemberDetailsForm extends FormBase {
     $entity = Node::create($nodeData);
     $entity->save();
 
-    drupal_set_message("Success",'status');
-    kint($this->redirect('user.info',['uId' => '2']));
-    return $this->redirect('user.info',['uId' => '2']);
+    $form_state->setRedirect('user.info',['uId' => $form_state->getValue('member')]);
   }
 
 

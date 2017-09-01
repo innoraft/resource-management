@@ -82,7 +82,7 @@ class UserProjectInfo extends ControllerBase{
 			],
 		);
 
-		$url = Url::fromRoute('user.data_entry',['uId'=>'2']);
+		$url = Url::fromRoute('user.data_entry',['uId'=>$uId]);
 		$url->setOptions($link_options);
 		$link = \Drupal\Core\Link::fromTextAndUrl($link_options['title'], $url )->toString();
 
