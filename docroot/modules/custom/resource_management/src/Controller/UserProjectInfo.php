@@ -5,7 +5,6 @@ namespace Drupal\resource_management\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Url;
-// use Drupal\Core\Render;
 /**
  * {@inheritdoc}
  */
@@ -14,12 +13,6 @@ class UserProjectInfo extends ControllerBase{
 	
 	public function content($uId){
 
-		// $div = array(
-		// 	'#type' => 'div',
-		// 	'attributes' => array(
-		// 		'id' => 'user-project-info',
-		// 	),
-		// );	
 		$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
 		$markup_form = \Drupal::service('renderer')->render($form);
 		
@@ -36,37 +29,59 @@ class UserProjectInfo extends ControllerBase{
 
 		$user = \Drupal\user\Entity\User::load($uId);
 		$name = $user->getusername();
-		// kint($user->getFieldDefinitions());die();
 		$specialization_vals = '';
 		$specialization = $user->get('field_specification')->getValue();
-
 		if(!empty($specialization)){
 			foreach ($specialization as $spec) {
 				$spec = \Drupal\taxonomy\Entity\Term::load($spec['target_id']);
-				$spec = strip_tags($spec->get('description')->getValue()[0]['value']);
-				$specialization_vals .= $spec.",";
+				if(!is_null($spec)){
+					$spec = strip_tags($spec->get('description')->getValue()[0]['value']);
+					$specialization_vals .= $spec.",";
+				}
 			}
 			$specialization_vals = substr($specialization_vals,0,-1);
 		}
 		else
 			$specialization_vals = 'No specialization given';
 
+		
+		$query = \Drupal::database()->select('paragraph__field_user_name', 'uname');
+		$query->fields('uname', ['entity_id']);
+		$query->condition('uname.field_user_name_target_id', $uId);
+		$rs = $query->execute();
+		$id = '';
+
+		$para_ids = array();
+		while($row = $rs->fetchAssoc()){
+			$para_ids[] = $row['entity_id'];
+		}
+
+		if (empty($para_ids)) {
+			kint($para_ids);
+			$markup_data = "No information avalaible for user yet.";
+			$markup_form = $markup_form->jsonSerialize();
+			$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data);
+			$build = array(
+				'#type' => 'markup',
+				'#markup' => $markup_obj,
+			);	
+			return $build;
+		}
 
 		$query = \Drupal::entityQuery('node')
 			->condition('type','project')
 			->condition('status',1)
-			->condition('uid',$uId);
+			->condition('field_member_details',$para_ids,'in');
 
-		$result = $query->execute();
+		$rs = $query->execute();
 
-		if(isset($result)){
-			$nids = array_keys($result);
+		if(isset($rs)){
+			$nids = array_keys($rs);
 			$nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
 		}
 
 		$paragraph_id = array();
 		foreach ($nodes as $node) {
-			// kint($node);die();
 			$paragraph = $node->get('field_member_details')->getValue();			
 			$paragraph_id[] = $paragraph[0]['target_id'];
 		}
@@ -81,7 +96,6 @@ class UserProjectInfo extends ControllerBase{
 			$paragraph[] = $paragraph_single;
 		}
 
-		// var_dump($total_non_billable);
 		$total = $total_billable + $total_non_billable;
 
 
@@ -92,9 +106,6 @@ class UserProjectInfo extends ControllerBase{
 			'attributes' => [
 				'class' => ['use-ajax'],
 				'data-dialog-type' => 'modal',
-				// 'data-dialog-options' => \Drupal\Component\Serialization\Json::encode([
-				// 		'&quot;width&quot;:700',
-				// 'data-dialog-options' => json_encode(['width'=>'700']),
 				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '700']),
 			],
 		);
@@ -112,7 +123,6 @@ class UserProjectInfo extends ControllerBase{
 		<div>".$link."</div>";
 		$markup_form = $markup_form->jsonSerialize();
 		$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data);
-		// kint($markup_obj->jsonSerialize());
 		$build = array(
 			'#type' => 'markup',
 			'#markup' => $markup_obj,
