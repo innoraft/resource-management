@@ -5,6 +5,7 @@ namespace Drupal\resource_management\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Url;
+// use Drupal\Core\Render;
 /**
  * {@inheritdoc}
  */
@@ -19,6 +20,20 @@ class UserProjectInfo extends ControllerBase{
 		// 		'id' => 'user-project-info',
 		// 	),
 		// );	
+		$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
+		$markup_form = \Drupal::service('renderer')->render($form);
+		
+		if($uId == '0'){
+			$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
+			$markup_form = \Drupal::service('renderer')->render($form);	
+			$build = array(
+				'#type' => 'markup',
+				'#markup' => $markup_form,
+			);	
+
+			return $build;
+		}
+
 		$user = \Drupal\user\Entity\User::load($uId);
 		$name = $user->getusername();
 		// kint($user->getFieldDefinitions());die();
@@ -51,6 +66,7 @@ class UserProjectInfo extends ControllerBase{
 
 		$paragraph_id = array();
 		foreach ($nodes as $node) {
+			// kint($node);die();
 			$paragraph = $node->get('field_member_details')->getValue();			
 			$paragraph_id[] = $paragraph[0]['target_id'];
 		}
@@ -76,9 +92,10 @@ class UserProjectInfo extends ControllerBase{
 			'attributes' => [
 				'class' => ['use-ajax'],
 				'data-dialog-type' => 'modal',
-				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode([
-						'width:700',
-				]),
+				// 'data-dialog-options' => \Drupal\Component\Serialization\Json::encode([
+				// 		'&quot;width&quot;:700',
+				// 'data-dialog-options' => json_encode(['width'=>'700']),
+				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '700']),
 			],
 		);
 
@@ -86,19 +103,20 @@ class UserProjectInfo extends ControllerBase{
 		$url->setOptions($link_options);
 		$link = \Drupal\Core\Link::fromTextAndUrl($link_options['title'], $url )->toString();
 
-		$markup = 
+		$markup_data =
 		"<div>Name : ".$name."</div>
 		<div>Specialization : ".$specialization_vals."</div>
 		<div>Total billable : ".$total_billable."</div>
 		<div>Total non-billable : ".$total_non_billable."</div>
 		<div>Total : ".$total."</div>
 		<div>".$link."</div>";
-		
-
+		$markup_form = $markup_form->jsonSerialize();
+		$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data);
+		// kint($markup_obj->jsonSerialize());
 		$build = array(
 			'#type' => 'markup',
-			'#markup' => $markup,
-		);
+			'#markup' => $markup_obj,
+		);	
 
 		return $build;
 	}

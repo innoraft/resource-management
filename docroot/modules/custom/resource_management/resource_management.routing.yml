@@ -3,6 +3,7 @@ user.info:
   defaults:
     _controller: '\Drupal\resource_management\Controller\UserProjectInfo::content'
     _title: 'User Project Information'
+    uId: '0'
   requirements:
     _permission: 'access content'
 
@@ -13,3 +14,5 @@ user.data_entry:
     _form: '\Drupal\resource_management\Form\MemberDetailsForm'
   requirements:
     _permission: 'access content'
+
+

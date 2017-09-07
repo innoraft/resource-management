@@ -121,7 +121,7 @@ class MemberDetailsForm extends FormBase {
     $entity = Node::create($nodeData);
     $entity->save();
 
-    $form_state->setRedirect('user.info',['uId' => $form_state->getValue('member')]);
+    $form_state->setRedirect('user.info',['uId' => $form_state->getValue('user_name')]);
   }
 
 
