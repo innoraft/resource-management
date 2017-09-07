@@ -13,8 +13,6 @@ class UserProjectInfo extends ControllerBase{
 	
 	public function content($uId){
 
-		$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
-		$markup_form = \Drupal::service('renderer')->render($form);
 		
 		if($uId == '0'){
 			$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
@@ -27,8 +25,16 @@ class UserProjectInfo extends ControllerBase{
 			return $build;
 		}
 
+
+		$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
+
+
 		$user = \Drupal\user\Entity\User::load($uId);
 		$name = $user->getusername();
+
+		$form['user_name']['#value'] = $name;
+		$markup_form = \Drupal::service('renderer')->render($form);
+
 		$specialization_vals = '';
 		$specialization = $user->get('field_specification')->getValue();
 		if(!empty($specialization)){
@@ -48,6 +54,7 @@ class UserProjectInfo extends ControllerBase{
 		$query = \Drupal::database()->select('paragraph__field_user_name', 'uname');
 		$query->fields('uname', ['entity_id']);
 		$query->condition('uname.field_user_name_target_id', $uId);
+		// $query->orderBy('entity_id','DESC');
 		$rs = $query->execute();
 		$id = '';
 
@@ -55,9 +62,9 @@ class UserProjectInfo extends ControllerBase{
 		while($row = $rs->fetchAssoc()){
 			$para_ids[] = $row['entity_id'];
 		}
-
+		// kint($para_ids);
 		if (empty($para_ids)) {
-			kint($para_ids);
+			// kint($para_ids);
 			$markup_data = "No information avalaible for user yet.";
 			$markup_form = $markup_form->jsonSerialize();
 			$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data);
@@ -122,13 +129,95 @@ class UserProjectInfo extends ControllerBase{
 		<div>Total : ".$total."</div>
 		<div>".$link."</div>";
 		$markup_form = $markup_form->jsonSerialize();
-		$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data);
+
+		$markup_nodes = $this->getUserNodes($uId);
+
+		$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data.$markup_nodes);
+
 		$build = array(
 			'#type' => 'markup',
 			'#markup' => $markup_obj,
 		);	
-
 		return $build;
 	}
 
+	public function getUserNodes($uId){
+
+		$query = \Drupal::database()->select('paragraph__field_user_name', 'uname');
+		$query->fields('uname', ['entity_id']);
+		$query->condition('uname.field_user_name_target_id', $uId);
+		$rs = $query->execute();
+
+		$para_ids = array();
+		while($row = $rs->fetchAssoc()){
+			$para_ids[] = $row['entity_id'];
+		}
+
+
+		if(empty($para_ids))
+			return NULL;
+
+		$query = \Drupal::entityQuery('node')
+			->condition('type','project')
+			->condition('status',1)
+			->condition('field_member_details',$para_ids,'in')
+			->sort('nid','DESC');
+
+		$rs = $query->execute();
+
+		if(!empty($rs)){
+			$nids = array_keys($rs);
+			$nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
+		}
+
+		$build = '';
+		$total_billable = 0.0;
+		$total_non_billable = 0.0;
+
+		foreach ($nodes as $node) {
+			$title = $node->getTitle();
+			$paragraph = $node->get('field_member_details')->getValue();			
+			$target_id = $paragraph[0]['target_id'];
+			$paragraph_single = Paragraph::load($target_id);
+			// kint($paragraph_single);
+			$total_billable = floatval($paragraph_single->get('field_total_billable')->getValue()[0]['value']);
+			$total_non_billable = floatval($paragraph_single->get('field_total_non_billable')->getValue());
+			$user_name = $paragraph_single->get('field_user_name')->getValue()[0]['target_id'];
+
+			$leadAndMemberId = $paragraph_single->get('field_lead_and_member')->getValue()[0]['target_id'];
+			$leadAndMemberPara = Paragraph::load($leadAndMemberId);
+			// kint($leadAndMemberPara);
+			// kint($leadAndMemberPara->get('field_lead')->getValue());
+			$lead = '';
+			$member = '';
+
+			if(!empty($leadAndMemberPara->get('field_lead')->getValue())) {
+				$lead = $leadAndMemberPara->get('field_lead')->getValue()[0]['target_id'];
+				$lead = \Drupal\user\Entity\User::load($lead);
+				$lead = $lead->getUsername();	
+			} else {
+				$lead = 'No lead';
+			}
+			
+			if(!empty($leadAndMemberPara->get('field_member')->getValue())) {
+				$member = $leadAndMemberPara->get('field_member')->getValue()[0]['target_id'];	
+				$member = \Drupal\user\Entity\User::load($member);
+				$member = $member->getUsername();	
+			} else {
+				$member = 'No member';
+			}
+			// die();
+
+			$build .= "<div style='border:1px solid #000'>".
+			"<div>Project Name : ".$title."</div>".
+			"<div>Lead : ".$lead."</div>".
+			"<div>Member : ".$member."</div>".
+			"<div>Total billable : ".$total_billable."</div>".
+			"<div>Total non-billable : ".$total_non_billable."</div>".
+			"</div>";			
+		}
+
+
+		return $build;
+	}
 }
