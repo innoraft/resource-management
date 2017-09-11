@@ -56,7 +56,7 @@ class UserProjectInfo extends ControllerBase{
 		$query->condition('uname.field_user_name_target_id', $uId);
 		// $query->orderBy('entity_id','DESC');
 		$rs = $query->execute();
-		$id = '';
+
 
 		$para_ids = array();
 		while($row = $rs->fetchAssoc()){
@@ -175,6 +175,23 @@ class UserProjectInfo extends ControllerBase{
 		$total_non_billable = 0.0;
 
 		foreach ($nodes as $node) {
+			// $node_link = '<a href="/node/' . $node->get('nid')->getValue()[0]['value'] . '/edit">Edit Node</a>';
+			// $node_link = $node->toLink()->toString()->getGeneratedLink();
+			$link_options = array(
+				'type' => 'link',
+				'title' => $this->t('Edit'),
+				// '#url' => \Drupal\Core\Url::fromRoute('user.info'),
+				'attributes' => [
+					'class' => ['use-ajax'],
+					'data-dialog-type' => 'modal',
+					'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '700']),
+				],
+			);
+			$nId = $node->get('nid')->getValue()[0]['value'];
+			$url = Url::fromRoute('user.data_entry',['uId'=>$uId , 'nid'=>$nId]);
+			$url->setOptions($link_options);
+			$node_link = \Drupal\Core\Link::fromTextAndUrl($link_options['title'], $url )->toString();
+			// kint($node_link);
 			$title = $node->getTitle();
 			$paragraph = $node->get('field_member_details')->getValue();			
 			$target_id = $paragraph[0]['target_id'];
@@ -214,6 +231,7 @@ class UserProjectInfo extends ControllerBase{
 			"<div>Member : ".$member."</div>".
 			"<div>Total billable : ".$total_billable."</div>".
 			"<div>Total non-billable : ".$total_non_billable."</div>".
+			"<div>Edit : ".$node_link."</div>".
 			"</div>";			
 		}
 

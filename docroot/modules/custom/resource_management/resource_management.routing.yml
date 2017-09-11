@@ -9,10 +9,14 @@ user.info:
 
 
 user.data_entry:
-  path: '/user_project_info/{$uId}/form'
+  path: '/user_project_info/{uId}/form/{nid}'
   defaults:
     _form: '\Drupal\resource_management\Form\MemberDetailsForm'
+    nid: NULL
   requirements:
     _permission: 'access content'
-
+  options:
+    parameters:
+      node:
+        type: entity:node
 
