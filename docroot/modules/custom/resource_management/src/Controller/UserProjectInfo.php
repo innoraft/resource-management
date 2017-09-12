@@ -113,7 +113,7 @@ class UserProjectInfo extends ControllerBase{
 			'attributes' => [
 				'class' => ['use-ajax'],
 				'data-dialog-type' => 'modal',
-				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '700']),
+				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '400']),
 			],
 		);
 
@@ -184,7 +184,7 @@ class UserProjectInfo extends ControllerBase{
 				'attributes' => [
 					'class' => ['use-ajax'],
 					'data-dialog-type' => 'modal',
-					'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '700']),
+					'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '400']),
 				],
 			);
 			$nId = $node->get('nid')->getValue()[0]['value'];
