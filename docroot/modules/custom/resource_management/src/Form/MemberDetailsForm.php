@@ -437,6 +437,15 @@ class MemberDetailsForm extends FormBase {
       }
     }
 
+    $member_billing_information_fieldset_group = $form_state->getValue('member_billing_information_fieldset')['group'];
+    $member_billing_information_fieldset_group_count = count($member_billing_information_fieldset_group);
+    foreach ($member_billing_information_fieldset_group as $key => $group) {
+        $member_bill_info['name'] = $group['member_name'];
+        $member_bill_info['billable'] = $group['billable'];
+        $member_bill_info['non_billable'] = $group['non_billable'];
+        $member_bill_info['time_duration'] = $group['time_duration'];
+    }
+
     if(!is_null($nid)){
 
       $node = \Drupal\node\Entity\Node::load($nid);
@@ -489,7 +498,7 @@ class MemberDetailsForm extends FormBase {
         $paragraph_lead_and_member[$i] = Paragraph::create([
           'type' => 'lead_and_member',
           'field_lead' => array('target_id' => $lead[$i]),
-          'field_member' => $member[$i]
+          'field_member' => $member[$i],
         ]);
         $paragraph_lead_and_member[$i]->save();
       }
@@ -500,13 +509,30 @@ class MemberDetailsForm extends FormBase {
         $paragraph_lead_and_member_array[$key]['target_revision_id'] = $paragraph_lead_and_member[$key]->getRevisionId();
       }
 
+      $paragraph_member_billing_information = array();
+
+      for($i=0; $i<$member_billing_information_fieldset_group_count; $i++){
+        $paragraph_member_billing_information[$i] = Paragraph::create([
+                  'type' => 'billing_information',
+                  'field_billable' => $member_bill_info['billable'],
+                  'field_non_billable' => $member_bill_info['non_billable'],
+                  'field_time_duration' => $member_bill_info['time_duration'],
+                  'field_user_name' => $member_bill_info['name'],
+                ]);
+        $paragraph_member_billing_information[$i]->save(); 
+      }
+
+      $paragraph_member_billing_information_array = array();
+      foreach ($paragraph_member_billing_information as $key => $value) {
+        $paragraph_member_billing_information_array[$key]['target_id'] = $paragraph_member_billing_information[$key]->id();
+        $paragraph_member_billing_information_array[$key]['target_revision_id'] = $paragraph_member_billing_information[$key]->getRevisionId();
+      }
+
       $paragraph_member_details = Paragraph::create([
-        'type' => 'member_details',
-        'field_lead_and_member' => $paragraph_lead_and_member_array,
-        'field_total_billable' => $form_state->getValue('field_billable'),
-        'field_total_non_billable' => 0,
-        'field_user_name' => array('target_id' => $form_state->getValue('user_name')),
-      ]);
+              'type' => 'member_details',
+              'field_lead_and_member' => $paragraph_lead_and_member_array,
+              'field_billing_information' => $paragraph_member_billing_information_array,
+            ]);
 
       $paragraph_member_details->save();
 
@@ -519,6 +545,7 @@ class MemberDetailsForm extends FormBase {
           'target_revision_id' => $paragraph_member_details->getRevisionId(),
         ),
       );
+      kint($nodeData);
       $entity = Node::create($nodeData);
       $entity->save();
 
