@@ -26,7 +26,7 @@ class MemberDetailsForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $uId = NULL,$nid = NULL) {
     $form['#tree'] = TRUE;
     $form_state->setCached(FALSE);
-    \Drupal::logger('resource_management')->notice('In buildform');
+    // \Drupal::logger('resource_management')->notice('In buildform');
     if(!is_null($nid)){
 
       $node = \Drupal\node\Entity\Node::load($nid);
@@ -164,7 +164,6 @@ class MemberDetailsForm extends FormBase {
           'wrapper' => 'lead_member_fieldset_wrapper'
         ),
       );
-    // kint($form['lead_member_fieldset']['actions']['add_name']);
 
       if($lead_member_fieldset_count > 1){
         $form['lead_member_fieldset']['actions']['remove_name'] = array(
@@ -194,7 +193,6 @@ class MemberDetailsForm extends FormBase {
       $form['field_billable'] = array(
         '#type' => 'textfield',
         '#title' => $this->t('Billable'),
-        '#required' => 'true',
         '#field_suffix' => '%',
       );
 
@@ -253,6 +251,12 @@ class MemberDetailsForm extends FormBase {
 
 
       for($j=0; $j<$lead_member_fieldset_count; $j++){
+        $form['lead_member_fieldset']['group'][$j] = array(
+          '#type' => 'fieldset',
+          '#title' => $this->t('Lead And Member'),
+          '#prefix' => '<div id="lead_member_fieldset_wrapper_'.$j.'">',
+          '#suffix' => '</div>'
+        );
         $form['lead_member_fieldset']['group'][$j]['lead'] = array(
           '#type' => 'entity_autocomplete',
           '#target_type' => 'user',
@@ -324,37 +328,83 @@ class MemberDetailsForm extends FormBase {
         );
       }
 
-      $form['user_name'] = array(
-        '#type' => 'entity_autocomplete',
-        '#target_type' => 'user',
-        '#cardinality' => '3',
-        '#title' => $this->t('User Name'),
-        '#required' => 'true',
+
+      $form['member_billing_information_fieldset'] = array(
+        '#type' => 'fieldset',
+        '#title' => $this->t('Billing Information'),
+        '#prefix' => '<div id="member_billing_information_fieldset_wrapper">',
+        '#suffix' => '</div>'
       );
 
-      $form['time_duration'] = array(
-        '#type' => 'textfield',
-        '#title' => $this->t('Time Duration'),
+      $billing_information_fieldset_count = 0;
+      $billing_information_count = $form_state->get('num_users_bill_info');
+      if(empty($billing_information_count)){
+        $billing_information_count = $form_state->set('num_users_bill_info',1);
+      }
+      if($form_state->get('num_users_bill_info') > 0){
+        $billing_information_fieldset_count = $form_state->get('num_users_bill_info');
+      }
+      else{
+        $billing_information_fieldset_count = 1;
+      }
+
+      
+      for($j=0; $j<$billing_information_fieldset_count; $j++){
+        
+        $form['member_billing_information_fieldset']['group'][$j] = array(
+          '#type' => 'fieldset',
+          '#title' => $this->t('Member Billing Information'),
+          '#prefix' => '<div id="member_billing_information_wrapper_'.$j.'">',
+          '#suffix' => '</div>'
+        );
+        $form['member_billing_information_fieldset']['group'][$j]['member_name'] = array(
+          '#type' => 'entity_autocomplete',
+          '#target_type' => 'user',
+          '#required' => 'true',
+          '#title' => $this->t('Member Name'),
+        );
+
+        $form['member_billing_information_fieldset']['group'][$j]['billable'] = array(
+          '#type' => 'textfield',
+          '#title' => $this->t('Billable'),
+          '#required' => 'true',
+          '#field_suffix' => '%',
+        );
+
+        $form['member_billing_information_fieldset']['group'][$j]['non_billable'] = array(
+          '#type' => 'textfield',
+          '#title' => $this->t('Non-Billable'),
+          '#required' => 'true',
+          '#field_suffix' => '%',
+        );
+        
+        $form['member_billing_information_fieldset']['group'][$j]['time_duration'] = array(
+          '#type' => 'textfield',
+          '#title' => $this->t('Time Duration'),
+        );
+      }
+
+      $form['member_billing_information_fieldset']['actions']['add_info'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add More Member Information'),
+        '#submit' => array('::addOneBillingInformationFieldset'),
+        '#ajax' => array(
+          'callback' => '::addMoreCallbackBillingInformationFieldset',
+          'wrapper' => 'member_billing_information_fieldset_wrapper',
+        ),
       );
 
-      $form['field_billable'] = array(
-        '#type' => 'textfield',
-        '#title' => $this->t('Billable'),
-        '#required' => 'true',
-        '#field_suffix' => '%',
-      );
-
-      $form['non_billable'] = array(
-        '#type' => 'textfield',
-        '#title' => $this->t('Non-Billable'),
-        '#field_suffix' => '%',
-      );
-
-
-      // $form['nid'] = array(
-      //   '#type' => 'value',
-      //   '#value' => $nid,
-      // );
+      if($billing_information_fieldset_count > 1){
+        $form['member_billing_information_fieldset']['actions']['remove_info'] = array(
+          '#type' => 'submit',
+          '#value' => t('Remove Above Member Information'),
+          '#submit' => array('::removeOneBillingInformationFieldset'),
+          '#ajax' => array(
+            'callback' => '::addMoreCallbackBillingInformationFieldset',
+            'wrapper' => 'member_billing_information_fieldset_wrapper',
+          ),
+        );
+      }
 
       $form['actions']['#type'] = 'actions';
       $form['actions']['submit'] = array(
@@ -481,7 +531,7 @@ class MemberDetailsForm extends FormBase {
     // \Drupal::logger('resource_management')->notice('trigger @trig',array('@trig'=>print_r($triggeringElement,true)));
     $triggeringElement = explode('-',$triggeringElement);
     $j = $triggeringElement[3]; //id of triggering element
-    \Drupal::logger('resource_management')->notice('In addOne Trigger @trig',array('@trig'=>$j));
+    // \Drupal::logger('resource_management')->notice('In addOne Trigger @trig',array('@trig'=>$j));
     $members_count = $form_state->get(['num_members',$j]);
     $add_button = $members_count+1;
     $form_state->set(['num_members',$j],$add_button);
@@ -491,7 +541,7 @@ class MemberDetailsForm extends FormBase {
   public function addMoreCallback(array &$form, FormStateInterface $form_state) {
     // \Drupal::logger('resource_management')->notice('In addMoreCallback');
     $triggeringElement = $form_state->getTriggeringElement()['#name'];
-    \Drupal::logger('resource_management')->notice('In addMoreCallback Trigger @trig',array('@trig'=>$triggeringElement));
+    // \Drupal::logger('resource_management')->notice('In addMoreCallback Trigger @trig',array('@trig'=>$triggeringElement));
     $triggeringElement = explode('-',$triggeringElement);
     $j = $triggeringElement[3]; //id of triggering element
     
@@ -540,4 +590,30 @@ class MemberDetailsForm extends FormBase {
     $form_state->setRebuild();
   }
 //////
+
+// ##  For billing Information   ##
+
+  public function addOneBillingInformationFieldset(array &$form, FormStateInterface $form_state) {
+    $users_bill_info_count = $form_state->get('num_users_bill_info');
+    $add_button = $users_bill_info_count + 1;
+    $form_state->set('num_users_bill_info',$add_button);
+
+    $form_state->setRebuild();
+  }
+
+  public function addMoreCallbackBillingInformationFieldset(array &$form, FormStateInterface $form_state) {
+    return $form['member_billing_information_fieldset'];
+  }
+
+  public function removeOneBillingInformationFieldset(array &$form, FormStateInterface $form_state) {
+    \Drupal::logger('resource_management')->notice('Removing');
+    $users_bill_info_count = $form_state->get('num_users_bill_info');
+    if($users_bill_info_count > 1){
+      $remove_button =  $users_bill_info_count - 1;
+      $form_state->set('num_users_bill_info',$remove_button);
+    }
+    $form_state->setRebuild();
+  }
+
+// ##     ##
 }

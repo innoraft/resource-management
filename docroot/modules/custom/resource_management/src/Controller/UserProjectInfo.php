@@ -62,12 +62,26 @@ class UserProjectInfo extends ControllerBase{
 		while($row = $rs->fetchAssoc()){
 			$para_ids[] = $row['entity_id'];
 		}
-		// kint($para_ids);
+		
 		if (empty($para_ids)) {
-			// kint($para_ids);
 			$markup_data = "No information avalaible for user yet.";
+
+
+			$link_options = array(
+				'type' => 'link',
+				'title' => $this->t('Add Information'),
+				// '#url' => \Drupal\Core\Url::fromRoute('user.info'),
+				'attributes' => [
+					'class' => ['use-ajax'],
+					'data-dialog-type' => 'modal',
+					'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '400']),
+				],
+			);
+			$url = Url::fromRoute('user.data_entry',['uId'=>$uId]);
+			$url->setOptions($link_options);
+			$link = \Drupal\Core\Link::fromTextAndUrl($link_options['title'], $url )->toString();
 			$markup_form = $markup_form->jsonSerialize();
-			$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data);
+			$markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data.'<br>'.$link);
 			$build = array(
 				'#type' => 'markup',
 				'#markup' => $markup_obj,
