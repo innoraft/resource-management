@@ -1,16 +1,16 @@
-uuid: ce2fb62c-07ef-4afb-bcba-64ccaddb8597
+uuid: 52923ab3-0fc3-4eb8-9c7c-2f8fe13022fa
 langcode: en
 status: true
 dependencies:
   module:
     - paragraphs
-    - user
-id: paragraph.field_user_name
-field_name: field_user_name
+id: paragraph.field_non_billable
+field_name: field_non_billable
 entity_type: paragraph
-type: entity_reference
+type: decimal
 settings:
-  target_type: user
+  precision: 10
+  scale: 2
 module: core
 locked: false
 cardinality: 1

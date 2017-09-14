@@ -3,10 +3,8 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.member_details.field_billing_information
     - field.field.paragraph.member_details.field_lead_and_member
-    - field.field.paragraph.member_details.field_total_billable
-    - field.field.paragraph.member_details.field_total_non_billable
-    - field.field.paragraph.member_details.field_user_name
     - paragraphs.paragraphs_type.member_details
   module:
     - paragraphs
@@ -15,6 +13,18 @@ targetEntityType: paragraph
 bundle: member_details
 mode: default
 content:
+  field_billing_information:
+    type: entity_reference_paragraphs
+    weight: 1
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+    third_party_settings: {  }
+    region: content
   field_lead_and_member:
     type: entity_reference_paragraphs
     weight: 0
@@ -26,29 +36,6 @@ content:
       form_display_mode: default
       default_paragraph_type: ''
     third_party_settings: {  }
-    region: content
-  field_total_billable:
-    weight: 2
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-    type: number
-    region: content
-  field_total_non_billable:
-    weight: 3
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-    type: number
-    region: content
-  field_user_name:
-    weight: 1
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete
     region: content
 hidden:
   created: true

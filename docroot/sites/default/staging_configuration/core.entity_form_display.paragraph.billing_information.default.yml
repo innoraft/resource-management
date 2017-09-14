@@ -1,0 +1,50 @@
+uuid: 703ad3b6-a20f-4165-939d-f8ba53b8ee99
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.billing_information.field_billable
+    - field.field.paragraph.billing_information.field_non_billable
+    - field.field.paragraph.billing_information.field_time_duration
+    - field.field.paragraph.billing_information.field_user_name
+    - paragraphs.paragraphs_type.billing_information
+  module:
+    - datetime
+id: paragraph.billing_information.default
+targetEntityType: paragraph
+bundle: billing_information
+mode: default
+content:
+  field_billable:
+    weight: 2
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+  field_non_billable:
+    weight: 3
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+  field_time_duration:
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_user_name:
+    weight: 0
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+hidden:
+  created: true
+  status: true
+  uid: true

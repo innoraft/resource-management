@@ -1,0 +1,21 @@
+uuid: deaf5962-6c9b-446f-a2c1-77621c9a85ef
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_time_duration
+    - paragraphs.paragraphs_type.billing_information
+  module:
+    - datetime
+id: paragraph.billing_information.field_time_duration
+field_name: field_time_duration
+entity_type: paragraph
+bundle: billing_information
+label: 'Time Duration'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

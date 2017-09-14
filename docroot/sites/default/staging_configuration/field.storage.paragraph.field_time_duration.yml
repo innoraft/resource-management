@@ -1,17 +1,17 @@
-uuid: 7181f24f-a609-4d1d-a201-b692edcb7dd1
+uuid: a968b47d-d1ba-4d1f-b5de-1d42690bf1b2
 langcode: en
 status: true
 dependencies:
   module:
+    - datetime
     - paragraphs
-id: paragraph.field_total_non_billable
-field_name: field_total_non_billable
+id: paragraph.field_time_duration
+field_name: field_time_duration
 entity_type: paragraph
-type: decimal
+type: datetime
 settings:
-  precision: 10
-  scale: 2
-module: core
+  datetime_type: datetime
+module: datetime
 locked: false
 cardinality: 1
 translatable: true

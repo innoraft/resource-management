@@ -1,11 +1,11 @@
-uuid: 5fb80a24-6d01-4003-9c47-7f9524092687
+uuid: edf1a8dd-04d8-4399-a262-1eff0a2c5a23
 langcode: en
 status: true
 dependencies:
   module:
     - paragraphs
-id: paragraph.field_total_billable
-field_name: field_total_billable
+id: paragraph.field_billable
+field_name: field_billable
 entity_type: paragraph
 type: decimal
 settings:
