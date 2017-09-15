@@ -14,7 +14,7 @@ class UserProjectInfo extends ControllerBase{
 	public function content($uId){
 
 		$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
-
+		// kint($uId);
 		if($uId == '0'){
 			$markup_form = \Drupal::service('renderer')->render($form);	
 			$build = array(
@@ -67,7 +67,7 @@ class UserProjectInfo extends ControllerBase{
 			'attributes' => [
 				'class' => ['use-ajax'],
 				'data-dialog-type' => 'modal',
-				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '400']),
+				'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '700']),
 			],
 		);
 
@@ -233,7 +233,7 @@ class UserProjectInfo extends ControllerBase{
 				'attributes' => [
 					'class' => ['use-ajax'],
 					'data-dialog-type' => 'modal',
-					'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '400']),
+					'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => '700']),
 				],
 			);
 			$nId = $node->get('nid')->getValue()[0]['value'];
