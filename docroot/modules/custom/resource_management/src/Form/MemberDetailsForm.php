@@ -230,10 +230,14 @@ class MemberDetailsForm extends FormBase {
           '#default_value' => $node['total_non_billable'][$j],
         );
         
-        $form['member_billing_information_fieldset']['group'][$j]['time_duration'] = array(
+        $form['member_billing_information_fieldset']['group'][$j]['start_date'] = array(
           '#type' => 'date',
-          '#title' => $this->t('Time Duration'),
-          // '#default_value' => $node
+          '#title' => $this->t('Start Date'),
+        );
+
+        $form['member_billing_information_fieldset']['group'][$j]['end_date'] = array(
+          '#type' => 'date',
+          '#title' => $this->t('End Date'),
         );
       }
 
@@ -430,9 +434,14 @@ class MemberDetailsForm extends FormBase {
           '#field_suffix' => '%',
         );
         
-        $form['member_billing_information_fieldset']['group'][$j]['time_duration'] = array(
+        $form['member_billing_information_fieldset']['group'][$j]['start_date'] = array(
           '#type' => 'date',
-          '#title' => $this->t('Time Duration'),
+          '#title' => $this->t('Start Date'),
+        );
+
+        $form['member_billing_information_fieldset']['group'][$j]['end_date'] = array(
+          '#type' => 'date',
+          '#title' => $this->t('End Date'),
         );
       }
 
@@ -492,11 +501,27 @@ class MemberDetailsForm extends FormBase {
     $member_billing_information_fieldset_group = $form_state->getValue('member_billing_information_fieldset')['group'];
     $member_billing_information_fieldset_group_count = count($member_billing_information_fieldset_group);
     $i = 0;
+
+    // kint($form_state);
+    // kint($form_state->getValue('member_billing_information_fieldset')['group'][0]['start_date']);
+    // kint($form_state->getValue('member_billing_information_fieldset')['group'][0]['end_date']);
+
+    // kint(date_diff($start_date,$end_date));
+
     foreach ($member_billing_information_fieldset_group as $key => $group) {
+        
+        $start_date = $group['start_date'];
+        $end_date = $group['end_date'];
+        $start_time = strtotime($start_date);
+        $end_time = strtotime($end_date);
+        $time_diff = $end_time - $start_time;
+        $hours = ($time_diff / 60)/60;
+        $days = $hours/24 + 1;
+
         $member_bill_info[$i]['name'] = $group['member_name'];
         $member_bill_info[$i]['billable'] = $group['billable'];
         $member_bill_info[$i]['non_billable'] = $group['non_billable'];
-        $member_bill_info[$i]['time_duration'] = $group['time_duration'];
+        $member_bill_info[$i]['time_duration'] = $days;
         $i++;
     }
 
@@ -577,7 +602,7 @@ class MemberDetailsForm extends FormBase {
       $paragraph_member_details->save();
 
       $node->save();
-      // kint($form_state->getValue('uid'));
+
       $form_state->setRedirect('user.info',['uId' => $form_state->get('uid')]);
     }
 
