@@ -211,6 +211,7 @@ class UserProjectInfo extends ControllerBase{
 				// $markup_nodes .= '<div> Time Duration : '.$billing_information['time_duration'].'</div>';
 			}
 			$markup_nodes .= '</div>';
+			$markup_nodes .= $node['link'];
 			$markup_nodes .= '</div>';
 		}
 
