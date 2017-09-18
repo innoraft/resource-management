@@ -55,9 +55,18 @@ class MemberDetailsForm extends FormBase {
       $i = 0;
       while(!empty($billing_information_para_id_array[$i])){
           $billing_information_para = Paragraph::load($billing_information_para_id_array[$i]['target_id']);
+          // kint($billing_information_para->get('field_start_date')->getValue()[0]['value']);
           $node['member_name'][$i] = \Drupal\user\Entity\User::load($billing_information_para->get('field_user_name')->getValue()[0]['target_id']);
           $node['total_billable'][$i] = $billing_information_para->get('field_billable')->getValue()[0]['value'];
           $node['total_non_billable'][$i] = $billing_information_para->get('field_non_billable')->getValue()[0]['value'];
+          if($billing_information_para->get('field_start_date')->getValue()){
+            $node['start_date'][$i] = $billing_information_para->get('field_start_date')->getValue()[0]['value'];
+            $node['end_date'][$i] = $billing_information_para->get('field_end_date')->getValue()[0]['value'];
+          }
+          else{
+            $node['start_date'][$i]  = '';
+            $node['end_date'][$i] = '';
+          }
           $i++;
       }
 
@@ -233,11 +242,13 @@ class MemberDetailsForm extends FormBase {
         $form['member_billing_information_fieldset']['group'][$j]['start_date'] = array(
           '#type' => 'date',
           '#title' => $this->t('Start Date'),
+          '#default_value' => $node['start_date'][$j],
         );
 
         $form['member_billing_information_fieldset']['group'][$j]['end_date'] = array(
           '#type' => 'date',
           '#title' => $this->t('End Date'),
+          '#default_value' => $node['end_date'][$j],
         );
       }
 
@@ -512,16 +523,12 @@ class MemberDetailsForm extends FormBase {
         
         $start_date = $group['start_date'];
         $end_date = $group['end_date'];
-        $start_time = strtotime($start_date);
-        $end_time = strtotime($end_date);
-        $time_diff = $end_time - $start_time;
-        $hours = ($time_diff / 60)/60;
-        $days = $hours/24 + 1;
-
+ 
         $member_bill_info[$i]['name'] = $group['member_name'];
         $member_bill_info[$i]['billable'] = $group['billable'];
         $member_bill_info[$i]['non_billable'] = $group['non_billable'];
-        $member_bill_info[$i]['time_duration'] = $days;
+        $member_bill_info[$i]['start_date'] = $group['start_date'];
+        $member_bill_info[$i]['end_date'] = $group['end_date'];
         $i++;
     }
 
@@ -573,7 +580,15 @@ class MemberDetailsForm extends FormBase {
           $billing_information_para->set('field_user_name',$member_bill_info[$i]['name']);
           $billing_information_para->set('field_billable',$member_bill_info[$i]['billable']);
           $billing_information_para->set('field_non_billable',$member_bill_info[$i]['non_billable']);
-          $billing_information_para->set('field_time_duration',$member_bill_info[$i]['time_duration']);
+          if(!empty($member_bill_info[$i]['start_date'])){
+            $billing_information_para->set('field_start_date',$member_bill_info[$i]['start_date']);
+            $billing_information_para->set('field_end_date',$member_bill_info[$i]['end_date']);
+          }
+          else{
+            $billing_information_para->set('field_start_date','');
+            $billing_information_para->set('field_end_date','');            
+          }
+          // $billing_information_para->set('field_time_duration',$member_bill_info[$i]['time_duration']);
           $billing_information_para->save();
           $paragraph_billing_information_array[$i] = array();
           $paragraph_billing_information_array[$i]['target_id'] = $field->getValue()['target_id'];
@@ -586,8 +601,9 @@ class MemberDetailsForm extends FormBase {
           'type' => 'billing_information',
           'field_billable' => $member_bill_info[$i]['billable'],
           'field_non_billable' => $member_bill_info[$i]['non_billable'],
-          'field_time_duration' => $member_bill_info[$i]['time_duration'],
           'field_user_name' => $member_bill_info[$i]['name'],
+          'field_start_date' => $member_bill_info[$i]['start_date'],
+          'field_end_date' => $member_bill_info[$i]['end_date'],
         ]);
         $paragraph->save();        
         $paragraph_billing_information_array[$i] = array();
@@ -631,7 +647,8 @@ class MemberDetailsForm extends FormBase {
                   'type' => 'billing_information',
                   'field_billable' => $member_bill_info[$i]['billable'],
                   'field_non_billable' => $member_bill_info[$i]['non_billable'],
-                  'field_time_duration' => $member_bill_info[$i]['time_duration'],
+                  'field_start_date' => $member_bill_info[$i]['start_date'],
+                  'field_end_date' => $member_bill_info[$i]['end_date'],
                   'field_user_name' => $member_bill_info[$i]['name'],
                 ]);
         $paragraph_member_billing_information[$i]->save(); 

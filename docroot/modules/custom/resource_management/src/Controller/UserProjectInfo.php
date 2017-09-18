@@ -8,6 +8,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
 use Drupal\user\Entity\User;
+use Drupal\Core\Datetime\DrupalDateTime;
 /**
  * {@inheritdoc}
  */
@@ -53,7 +54,6 @@ class UserProjectInfo extends ControllerBase{
 		$query->fields('b_info', ['entity_id']);
 		$query->join('paragraph__field_user_name','uname','b_info.field_billing_information_target_id = uname.entity_id');
 		$query->condition('uname.field_user_name_target_id', $uId);
-		// $query->orderBy('entity_id','DESC');
 		$rs = $query->execute();
 
 		$para_ids = array();
@@ -142,13 +142,23 @@ class UserProjectInfo extends ControllerBase{
 				$node[$i]['billing_information'][$key]['billable'] = $paragraph_billing_information->get('field_billable')->getValue()[0]['value'];
 				$node[$i]['billing_information'][$key]['non_billable'] = $paragraph_billing_information->get('field_non_billable')->getValue()[0]['value'];
 
+				if(!empty($paragraph_billing_information->get('field_end_date')->getValue())){
+						$date_time_object = new DrupalDateTime();
+						$start_date = $date_time_object->createFromTimestamp(strtotime($paragraph_billing_information->get('field_start_date')->getValue()[0]['value']))->format('d/M/Y');
+						$end_date = $date_time_object->createFromTimestamp(strtotime($paragraph_billing_information->get('field_end_date')->getValue()[0]['value']))->format('d/M/Y');
+						$node[$i]['billing_information'][$key]['start_date'] = $start_date;
+						$node[$i]['billing_information'][$key]['end_date'] = $end_date;
+				}
+				else{
+						$node[$i]['billing_information'][$key]['start_date'] = 'No date given';
+						$node[$i]['billing_information'][$key]['end_date'] = 'No date given';					
+				}
 				if($uId == $node[$i]['billing_information'][$key]['user_name']){
 					$total_billable += $node[$i]['billing_information'][$key]['billable'];
 					$total_non_billable += $node[$i]['billing_information'][$key]['non_billable'];
 					$user_node_count++;
 				}
 
-				// $node[$i]['billing_information'][$key]['time_duration'] = $paragraph_billing_information->get('field_user_name')->getValue()[0]['time_duration'];
 			}
 
 			$nId = $node_detail->get('nid')->getValue()[0]['value'];
@@ -156,7 +166,6 @@ class UserProjectInfo extends ControllerBase{
 			$link_options['title'] = 'Edit Information';
 			$url->setOptions($link_options);
 			$node[$i]['link'] = Link::fromTextAndUrl($link_options['title'], $url )->toString();
-			// $time_duration[$i] = $billing_information_para->get('field_time_duration')->getValue()[0]['value'];
 			$i++;
 		}
 
@@ -172,9 +181,6 @@ class UserProjectInfo extends ControllerBase{
 		<div>".$link."</div>";
 		$markup_form = $markup_form->jsonSerialize();
 
-		// $markup_nodes = $this->getUserNodes($uId);
-
-		// $markup_obj = \Drupal\Core\Render\Markup::create($markup_form.$markup_data.$markup_nodes);
 		$markup_obj = Markup::create($markup_form.$markup_data.$markup_nodes);
 
 		$build = array(
@@ -204,11 +210,12 @@ class UserProjectInfo extends ControllerBase{
 			$markup_nodes .= '<div class = "billing_information_group" style="border:1px solid #000;">';				
 			foreach ($node['billing_information'] as $key => $billing_information) {
 				$markup_nodes .= '<div class = "billing_information_group'.$key.'" style="border-top:1px solid #913;border-bottom:1px solid #713;" >';				
-				$markup_nodes .= '<div> User Name : '.User::load($billing_information['user_name'])->getusername().'</div>';
+				$markup_nodes .= '<div> User Name : '.User::load($billing_information['user_name'])->getUsername().'</div>';
 				$markup_nodes .= '<div> Billable : '.$billing_information['billable'].'%</div>';
 				$markup_nodes .= '<div> Non-Billable : '.$billing_information['non_billable'].'%</div>';
+				$markup_nodes .= '<div> Start Date : '.$billing_information['start_date'].'</div>';
+				$markup_nodes .= '<div> End Date : '.$billing_information['end_date'].'</div>';
 				$markup_nodes .= '</div>';
-				// $markup_nodes .= '<div> Time Duration : '.$billing_information['time_duration'].'</div>';
 			}
 			$markup_nodes .= '</div>';
 			$markup_nodes .= $node['link'];
