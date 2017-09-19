@@ -125,9 +125,11 @@ class UserProjectInfo extends ControllerBase{
 		$delete_link_options = array(
 			'type' => 'link',
 			'title' => $this->t('Delete Information'),
-			// 'attributes' => [
-			// 	'class' => ['use-ajax'],
-			// ],
+			'attributes' => [
+				// 'class' => ['use-ajax','delete-link'],
+				'class' => ['delete-link'],
+				'data-toggle' => 'confirmation',
+			],
 		);
 
 		foreach ($nodes as $node_detail) {
