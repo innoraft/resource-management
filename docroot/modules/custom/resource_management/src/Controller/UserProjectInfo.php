@@ -122,26 +122,44 @@ class UserProjectInfo extends ControllerBase{
 		$total_billable = 0.0;
 		$total_non_billable = 0.0;
 
+		$delete_link_options = array(
+			'type' => 'link',
+			'title' => $this->t('Delete Information'),
+			// 'attributes' => [
+			// 	'class' => ['use-ajax'],
+			// ],
+		);
+
 		foreach ($nodes as $node_detail) {
 			$node[$i]['title']  = $node_detail->getTitle();
 			$paragraph_member_details =Paragraph::load($node_detail->get('field_member_details')->getValue()[0]['target_id']);
 			$paragraph_lead_and_member_array = $paragraph_member_details->get('field_lead_and_member')->getValue();
 			foreach ($paragraph_lead_and_member_array as $key => $value) {
 				$paragraph_lead_and_member = Paragraph::load($value['target_id']);
-				$node[$i]['lead'][$key] = $paragraph_lead_and_member->get('field_lead')->getValue()[0]['target_id'];
-				
-				foreach ($paragraph_lead_and_member->get('field_member')->getValue() as $key1 => $member) {
-					$node[$i]['member'][$key][$key1] = $member['target_id'];
+				if(!is_null($paragraph_lead_and_member)){
+					$node[$i]['lead_member_group_id'][$key]['id'] = $value['target_id'];
+					$node[$i]['lead'][$key] = $paragraph_lead_and_member->get('field_lead')->getValue()[0]['target_id'];
+					
+					foreach ($paragraph_lead_and_member->get('field_member')->getValue() as $key1 => $member) {
+						$node[$i]['member'][$key][$key1] = $member['target_id'];
+					}
+					$delete_url = Url::fromRoute('user.delete_paragraph',['pid'=>$value['target_id'] ,'uId' => $uId]);
+					$delete_url->setOptions($delete_link_options);
+					$node[$i]['lead_member_group_id'][$key]['delete_link'] = Link::fromTextAndUrl($delete_link_options['title'], $delete_url)->toString();
 				}
 			}
-
 			$paragraph_billing_information_array = $paragraph_member_details->get('field_billing_information')->getValue();
+			
+
 			foreach ($paragraph_billing_information_array as $key => $value) {
 				$paragraph_billing_information = Paragraph::load($value['target_id']);
+				$node[$i]['billing_information'][$key]['id'] = $value['target_id'];
 				$node[$i]['billing_information'][$key]['user_name'] = $paragraph_billing_information->get('field_user_name')->getValue()[0]['target_id'];
 				$node[$i]['billing_information'][$key]['billable'] = $paragraph_billing_information->get('field_billable')->getValue()[0]['value'];
 				$node[$i]['billing_information'][$key]['non_billable'] = $paragraph_billing_information->get('field_non_billable')->getValue()[0]['value'];
-
+				$delete_url = Url::fromRoute('user.delete_paragraph',['pid'=>$value['target_id'] , 'uId' => $uId]);
+				$delete_url->setOptions($delete_link_options);
+				$node[$i]['billing_information'][$key]['delete_link'] = Link::fromTextAndUrl($delete_link_options['title'], $delete_url)->toString();
 				if(!empty($paragraph_billing_information->get('field_end_date')->getValue())){
 						$date_time_object = new DrupalDateTime();
 						$start_date = $date_time_object->createFromTimestamp(strtotime($paragraph_billing_information->get('field_start_date')->getValue()[0]['value']))->format('d/M/Y');
@@ -186,6 +204,11 @@ class UserProjectInfo extends ControllerBase{
 		$build = array(
 			'#type' => 'markup',
 			'#markup' => $markup_obj,
+			'#attached' => array(
+				'library' => array(
+					'resource_management/lib1'
+				),
+			),
 		);	
 		return $build;
 	}
@@ -196,25 +219,29 @@ class UserProjectInfo extends ControllerBase{
 			$markup_nodes .= '<div class = "node" style="border:5px solid #390">';
 
 			$markup_nodes .= '<div>Project Name : '.$node['title'].'</div>';
-			$markup_nodes .= '<div class = "lead_member_group">';				
-			foreach ($node['lead'] as $key1 => $lead) {
-				$markup_nodes .= '<div class = "lead_member_group'.$key1.'" style="border-top:1px solid #000;border-bottom:1px solid #000;">';				
-				$markup_nodes .= '<div> Lead : '.User::load($lead)->getUsername().'</div>';
-				foreach ($node['member'][$key1] as $key2 => $member) {
-					$markup_nodes .= '<div> Member : '.User::load($member)->getUsername().'</div>';
+			$markup_nodes .= '<div class = "lead-member-group-wrapper">';				
+			if(!empty($node['lead'])){
+				foreach ($node['lead'] as $key1 => $lead) {
+					$markup_nodes .= '<div id = "lead-member-group-'.$node['lead_member_group_id'][$key1]['id'].'" style="border-top:1px solid #000;border-bottom:1px solid #000;">';				
+					$markup_nodes .= '<div> Lead : '.User::load($lead)->getUsername().'</div>';
+					foreach ($node['member'][$key1] as $key2 => $member) {
+						$markup_nodes .= '<div> Member : '.User::load($member)->getUsername().'</div>';
+					}
+					$markup_nodes .= '<div>'.$node['lead_member_group_id'][$key1]['delete_link'].'</div>';
+					$markup_nodes .= '</div>';
 				}
-				$markup_nodes .= '</div>';
 			}
 			$markup_nodes .= '</div>';
 
-			$markup_nodes .= '<div class = "billing_information_group" style="border:1px solid #000;">';				
+			$markup_nodes .= '<div class = "billing-information-group-wrapper" style="border:1px solid #000;">';				
 			foreach ($node['billing_information'] as $key => $billing_information) {
-				$markup_nodes .= '<div class = "billing_information_group'.$key.'" style="border-top:1px solid #913;border-bottom:1px solid #713;" >';				
+				$markup_nodes .= '<div id = "billing-information-group-'.$billing_information['id'].'" style="border-top:1px solid #913;border-bottom:1px solid #713;" >';				
 				$markup_nodes .= '<div> User Name : '.User::load($billing_information['user_name'])->getUsername().'</div>';
 				$markup_nodes .= '<div> Billable : '.$billing_information['billable'].'%</div>';
 				$markup_nodes .= '<div> Non-Billable : '.$billing_information['non_billable'].'%</div>';
 				$markup_nodes .= '<div> Start Date : '.$billing_information['start_date'].'</div>';
 				$markup_nodes .= '<div> End Date : '.$billing_information['end_date'].'</div>';
+				$markup_nodes .= '<div>'.$billing_information['delete_link'].'</div>';
 				$markup_nodes .= '</div>';
 			}
 			$markup_nodes .= '</div>';
@@ -225,5 +252,39 @@ class UserProjectInfo extends ControllerBase{
 		return $markup_nodes;
 	}
 
+	public function delete($pid,$uId){
+		$paragraph_id = $pid;
+		$storage = \Drupal::entityTypeManager()->getStorage('paragraph');
+		$paragraph = $storage->load($paragraph_id);
+		$paragraph_type = $paragraph->getType();
+		$paragraph_parent = $paragraph->get('parent_id')->getValue()[0]['value'];
+		$paragraph_parent = Paragraph::load($paragraph_parent);
+		$key = NULL;
+
+		if(strcmp($paragraph_type, 'lead_and_member') === 0){
+			$paragraph_lead_and_member_array = $paragraph_parent->get('field_lead_and_member')->getValue();
+			foreach ($paragraph_lead_and_member_array as $key1 => $paragraph_lead_and_member) {
+				if($paragraph_lead_and_member['target_id'] === $paragraph_id)
+					$key = $key1;
+			}
+			array_splice($paragraph_lead_and_member_array,$key, 1);
+			$paragraph_parent->set('field_lead_and_member',$paragraph_lead_and_member_array);
+			$paragraph_parent->save();
+		}
+		else{
+			$paragraph_billing_information_array = $paragraph_parent->get('field_billing_information')->getValue();
+			$key = array_search($paragraph_id , $paragraph_billing_information_array);
+			foreach ($paragraph_billing_information_array as $key1 => $paragraph_billing_information) {
+				if($paragraph_billing_information['target_id'] === $paragraph_id)
+					$key = $key1;
+			}
+			array_splice($paragraph_billing_information_array, $key, 1);
+			$paragraph_parent->set('field_billing_information',$paragraph_billing_information_array);
+			$paragraph_parent->save();
+		}
+		$paragraph->delete();
+
+		return $this->redirect('user.info',['uId' => $uId]);
+	}
 
 }

@@ -20,3 +20,9 @@ user.data_entry:
       node:
         type: entity:node
 
+user.delete_paragraph:
+  path: '/user_project_info/delete/{pid}/{uId}'
+  defaults:
+    _controller: '\Drupal\resource_management\Controller\UserProjectInfo::delete'
+  requirements:
+    _permission: 'access content'

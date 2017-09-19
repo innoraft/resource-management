@@ -1,0 +1,9 @@
+lib1:
+  css:
+    theme:
+      css/style.css: {}
+  js:
+    js/main.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
