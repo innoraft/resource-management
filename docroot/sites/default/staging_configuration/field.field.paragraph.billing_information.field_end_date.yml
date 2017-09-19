@@ -1,17 +1,17 @@
-uuid: deaf5962-6c9b-446f-a2c1-77621c9a85ef
+uuid: 9755d191-e1bd-402a-aef7-d7f9979d760c
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.paragraph.field_time_duration
+    - field.storage.paragraph.field_end_date
     - paragraphs.paragraphs_type.billing_information
   module:
     - datetime
-id: paragraph.billing_information.field_time_duration
-field_name: field_time_duration
+id: paragraph.billing_information.field_end_date
+field_name: field_end_date
 entity_type: paragraph
 bundle: billing_information
-label: 'Time Duration'
+label: 'End Date'
 description: ''
 required: false
 translatable: false

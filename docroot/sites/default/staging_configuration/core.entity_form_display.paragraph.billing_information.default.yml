@@ -4,8 +4,9 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.billing_information.field_billable
+    - field.field.paragraph.billing_information.field_end_date
     - field.field.paragraph.billing_information.field_non_billable
-    - field.field.paragraph.billing_information.field_time_duration
+    - field.field.paragraph.billing_information.field_start_date
     - field.field.paragraph.billing_information.field_user_name
     - paragraphs.paragraphs_type.billing_information
   module:
@@ -16,20 +17,26 @@ bundle: billing_information
 mode: default
 content:
   field_billable:
-    weight: 2
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-    type: number
-    region: content
-  field_non_billable:
     weight: 3
     settings:
       placeholder: ''
     third_party_settings: {  }
     type: number
     region: content
-  field_time_duration:
+  field_end_date:
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_non_billable:
+    weight: 4
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+  field_start_date:
     weight: 1
     settings: {  }
     third_party_settings: {  }

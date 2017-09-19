@@ -1,16 +1,16 @@
-uuid: a968b47d-d1ba-4d1f-b5de-1d42690bf1b2
+uuid: c02833dc-ef98-4976-9dfc-339832c4cdeb
 langcode: en
 status: true
 dependencies:
   module:
     - datetime
     - paragraphs
-id: paragraph.field_time_duration
-field_name: field_time_duration
+id: paragraph.field_end_date
+field_name: field_end_date
 entity_type: paragraph
 type: datetime
 settings:
-  datetime_type: datetime
+  datetime_type: date
 module: datetime
 locked: false
 cardinality: 1
