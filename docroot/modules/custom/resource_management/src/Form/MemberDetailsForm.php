@@ -55,7 +55,6 @@ class MemberDetailsForm extends FormBase {
       $i = 0;
       while(!empty($billing_information_para_id_array[$i])){
           $billing_information_para = Paragraph::load($billing_information_para_id_array[$i]['target_id']);
-          // kint($billing_information_para->get('field_start_date')->getValue()[0]['value']);
           $node['member_name'][$i] = \Drupal\user\Entity\User::load($billing_information_para->get('field_user_name')->getValue()[0]['target_id']);
           $node['total_billable'][$i] = $billing_information_para->get('field_billable')->getValue()[0]['value'];
           $node['total_non_billable'][$i] = $billing_information_para->get('field_non_billable')->getValue()[0]['value'];
@@ -242,12 +241,14 @@ class MemberDetailsForm extends FormBase {
         $form['member_billing_information_fieldset']['group'][$j]['start_date'] = array(
           '#type' => 'date',
           '#title' => $this->t('Start Date'),
+          '#required' => 'true',
           '#default_value' => $node['start_date'][$j],
         );
 
         $form['member_billing_information_fieldset']['group'][$j]['end_date'] = array(
           '#type' => 'date',
           '#title' => $this->t('End Date'),
+          '#required' => 'true',
           '#default_value' => $node['end_date'][$j],
         );
       }
@@ -447,11 +448,13 @@ class MemberDetailsForm extends FormBase {
         
         $form['member_billing_information_fieldset']['group'][$j]['start_date'] = array(
           '#type' => 'date',
+          '#required' => 'true',
           '#title' => $this->t('Start Date'),
         );
 
         $form['member_billing_information_fieldset']['group'][$j]['end_date'] = array(
           '#type' => 'date',
+          '#required' => 'true',
           '#title' => $this->t('End Date'),
         );
       }
@@ -512,12 +515,6 @@ class MemberDetailsForm extends FormBase {
     $member_billing_information_fieldset_group = $form_state->getValue('member_billing_information_fieldset')['group'];
     $member_billing_information_fieldset_group_count = count($member_billing_information_fieldset_group);
     $i = 0;
-
-    // kint($form_state);
-    // kint($form_state->getValue('member_billing_information_fieldset')['group'][0]['start_date']);
-    // kint($form_state->getValue('member_billing_information_fieldset')['group'][0]['end_date']);
-
-    // kint(date_diff($start_date,$end_date));
 
     foreach ($member_billing_information_fieldset_group as $key => $group) {
         
@@ -588,7 +585,7 @@ class MemberDetailsForm extends FormBase {
             $billing_information_para->set('field_start_date','');
             $billing_information_para->set('field_end_date','');            
           }
-          // $billing_information_para->set('field_time_duration',$member_bill_info[$i]['time_duration']);
+ 
           $billing_information_para->save();
           $paragraph_billing_information_array[$i] = array();
           $paragraph_billing_information_array[$i]['target_id'] = $field->getValue()['target_id'];
@@ -689,7 +686,6 @@ class MemberDetailsForm extends FormBase {
     $triggeringElement = explode('-',$triggeringElement);
     $j = $triggeringElement[3]; //id of triggering element
     $members_count = $form_state->get(['num_members',$j]);
-    // \Drupal::logger('resource_management')->notice('@members',array('@members'=>$members_count));
     $add_button = $members_count+1;
     $form_state->set(['num_members',$j],$add_button);
     $form_state->setRebuild();
@@ -716,9 +712,6 @@ class MemberDetailsForm extends FormBase {
     $form_state->setRebuild();
   }
 
-
-////// For lead and member
-
   public function addOneLeadMemberFieldset(array &$form, FormStateInterface $form_state) {
     $lead_members_count = $form_state->get('num_lead_member');
     $add_button = $lead_members_count+1;
@@ -743,15 +736,12 @@ class MemberDetailsForm extends FormBase {
     }
     $form_state->setRebuild();
   }
-//////
 
-// ##  For billing Information   ##
 
   public function addOneBillingInformationFieldset(array &$form, FormStateInterface $form_state) {
     $users_bill_info_count = $form_state->get('num_users_bill_info');
     $add_button = $users_bill_info_count + 1;
     $form_state->set('num_users_bill_info',$add_button);
-    // \Drupal::logger('resource_management')->notice('@count',array('@count'=>$add_button));
     $form_state->setRebuild();
   }
 
@@ -769,5 +759,4 @@ class MemberDetailsForm extends FormBase {
     $form_state->setRebuild();
   }
 
-// ##     ##
 }

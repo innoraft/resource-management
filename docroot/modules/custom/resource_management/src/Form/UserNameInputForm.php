@@ -47,6 +47,4 @@ class UserNameInputForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state->setRedirect('user.info',['uId' => $form_state->getValue('user_name')]);
   }
-
-
 }

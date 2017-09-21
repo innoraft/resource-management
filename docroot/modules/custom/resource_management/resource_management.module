@@ -1,0 +1,11 @@
+<?php
+
+function resource_management_theme() {
+	return [
+		'block__user_project_info' => [
+			'variables' => [
+			  'nodes' => array(),
+			],
+		],
+	];
+}

@@ -17,49 +17,35 @@ class UserProjectInfo extends ControllerBase{
 	
 	public function content($uId){
 
+		$user = User::load($uId);
+		$name = (!empty($user)) ? $user->getUsername() : NULL;
 		$form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\UserNameInputForm');
-		if($uId == '0'){
-			$markup_form = \Drupal::service('renderer')->render($form);	
+		$form['user_name']['#value'] = $name;
+		$markup_form = \Drupal::service('renderer')->render($form);	
+
+		if ($name == NULL) {
 			$build = array(
 				'#type' => 'markup',
 				'#markup' => $markup_form,
-			);	
-
+			);
 			return $build;
 		}
 
-		$user = User::load($uId);
-		$name = $user->getUsername();
 
-		$form['user_name']['#value'] = $name;
-		$markup_form = \Drupal::service('renderer')->render($form);
-
-		$specialization_vals = '';
 		$specialization = $user->get('field_specification')->getValue();
-		if(!empty($specialization)){
-			foreach ($specialization as $spec) {
-				$spec = \Drupal\taxonomy\Entity\Term::load($spec['target_id']);
-				if(!is_null($spec)){
-					$spec = strip_tags($spec->get('description')->getValue()[0]['value']);
-					$specialization_vals .= $spec.",";
-				}
-			}
-			$specialization_vals = substr($specialization_vals,0,-1);
+		if (!empty($specialization)) {
+			$specialization_vals = array();
+			$specialization = $user->get('field_specification')->getValue();
+			$specialization_vals =  array_column($specialization, 'target_id');
+			array_walk($specialization_vals, array($this,'load_term'));
+			$specialization_vals = implode(',', $specialization_vals);
 		}
-		else
-			$specialization_vals = 'No specialization given';
-
-		
-		$query = \Drupal::database()->select('paragraph__field_billing_information','b_info');
-		$query->fields('b_info', ['entity_id']);
-		$query->join('paragraph__field_user_name','uname','b_info.field_billing_information_target_id = uname.entity_id');
-		$query->condition('uname.field_user_name_target_id', $uId);
-		$rs = $query->execute();
-
-		$para_ids = array();
-		while($row = $rs->fetchAssoc()){
-			$para_ids[] = $row['entity_id'];
+		else{
+		 	$specialization_vals = $this->t('No specialization given');
 		}
+
+
+		$para_ids = $this->get_user_billing_information_paragraphs($uId);
 
 		$link_options = array(
 			'type' => 'link',
@@ -75,10 +61,10 @@ class UserProjectInfo extends ControllerBase{
 
 
 		if (empty($para_ids)) {
-			$link_options['title'] = 'Add Information';
+			$link_options['title'] = $this->t('Add Information');
 			$url->setOptions($link_options);
 			$link = Link::fromTextAndUrl($link_options['title'], $url )->toString();
-			$markup_data = "No information avalaible for user yet.";
+			$markup_data = $this->t("No information avalaible for user yet.");
 			$markup_form = $markup_form->jsonSerialize();
 			$markup_obj = Markup::create($markup_form.$markup_data.'<br>'.$link);
 			$build = array(
@@ -99,14 +85,14 @@ class UserProjectInfo extends ControllerBase{
 
 		$nodes = NULL;
 		if(!empty($rs)){
-			$nids = array_values($rs);  // or array_keys check
+			$nids = array_values($rs); 
 			$nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
 		}
 		else{
-			$link_options['title'] = 'Add Information';
+			$link_options['title'] = $this->t('Add Information');
 			$url->setOptions($link_options);
 			$link = Link::fromTextAndUrl($link_options['title'], $url )->toString();
-			$markup_data = "No information avalaible for user yet.";
+			$markup_data = $this->t("No information avalaible for user yet.");
 			$markup_form = $markup_form->jsonSerialize();
 			$markup_obj = Markup::create($markup_form.$markup_data.'<br>'.$link);
 			$build = array(
@@ -126,7 +112,6 @@ class UserProjectInfo extends ControllerBase{
 			'type' => 'link',
 			'title' => $this->t('Delete Information'),
 			'attributes' => [
-				// 'class' => ['use-ajax','delete-link'],
 				'class' => ['delete-link'],
 				'data-toggle' => 'confirmation',
 			],
@@ -134,64 +119,66 @@ class UserProjectInfo extends ControllerBase{
 
 		foreach ($nodes as $node_detail) {
 			$node[$i]['title']  = $node_detail->getTitle();
-			$paragraph_member_details =Paragraph::load($node_detail->get('field_member_details')->getValue()[0]['target_id']);
-			$paragraph_lead_and_member_array = $paragraph_member_details->get('field_lead_and_member')->getValue();
-			foreach ($paragraph_lead_and_member_array as $key => $value) {
-				$paragraph_lead_and_member = Paragraph::load($value['target_id']);
-				if(!is_null($paragraph_lead_and_member)){
-					$node[$i]['lead_member_group_id'][$key]['id'] = $value['target_id'];
-					$node[$i]['lead'][$key] = $paragraph_lead_and_member->get('field_lead')->getValue()[0]['target_id'];
-					
-					foreach ($paragraph_lead_and_member->get('field_member')->getValue() as $key1 => $member) {
-						$node[$i]['member'][$key][$key1] = $member['target_id'];
+			if(!empty($node_detail->get('field_member_details')->getValue())){
+				$paragraph_member_details = Paragraph::load($node_detail->get('field_member_details')->getValue()[0]['target_id']);
+				$paragraph_lead_and_member_array = $paragraph_member_details->get('field_lead_and_member')->getValue();
+				if(!empty($paragraph_lead_and_member_array)){
+					foreach ($paragraph_lead_and_member_array as $key => $value) {
+						$paragraph_lead_and_member = Paragraph::load($value['target_id']);
+						$node[$i]['lead_member_group_id'][$key]['id'] = $value['target_id'];
+						$node[$i]['lead'][$key] = User::load($paragraph_lead_and_member->get('field_lead')->getValue()[0]['target_id'])->getUsername();
+						
+						foreach ($paragraph_lead_and_member->get('field_member')->getValue() as $key1 => $member) {
+							$node[$i]['member'][$key][$key1] = User::load($member['target_id'])->getUsername();
+						}
+						$delete_url = Url::fromRoute('user.delete_paragraph',['pid'=>$value['target_id'] ,'uId' => $uId]);
+						$delete_url->setOptions($delete_link_options);
+						$node[$i]['lead_member_group_id'][$key]['delete_link'] = Link::fromTextAndUrl($delete_link_options['title'], $delete_url)->toString();
 					}
-					$delete_url = Url::fromRoute('user.delete_paragraph',['pid'=>$value['target_id'] ,'uId' => $uId]);
-					$delete_url->setOptions($delete_link_options);
-					$node[$i]['lead_member_group_id'][$key]['delete_link'] = Link::fromTextAndUrl($delete_link_options['title'], $delete_url)->toString();
-				}
-			}
-			$paragraph_billing_information_array = $paragraph_member_details->get('field_billing_information')->getValue();
-			
-
-			foreach ($paragraph_billing_information_array as $key => $value) {
-				$paragraph_billing_information = Paragraph::load($value['target_id']);
-				$node[$i]['billing_information'][$key]['id'] = $value['target_id'];
-				$node[$i]['billing_information'][$key]['user_name'] = $paragraph_billing_information->get('field_user_name')->getValue()[0]['target_id'];
-				$node[$i]['billing_information'][$key]['billable'] = $paragraph_billing_information->get('field_billable')->getValue()[0]['value'];
-				$node[$i]['billing_information'][$key]['non_billable'] = $paragraph_billing_information->get('field_non_billable')->getValue()[0]['value'];
-				$delete_url = Url::fromRoute('user.delete_paragraph',['pid'=>$value['target_id'] , 'uId' => $uId]);
-				$delete_url->setOptions($delete_link_options);
-				$node[$i]['billing_information'][$key]['delete_link'] = Link::fromTextAndUrl($delete_link_options['title'], $delete_url)->toString();
-				if(!empty($paragraph_billing_information->get('field_end_date')->getValue())){
-						$date_time_object = new DrupalDateTime();
-						$start_date = $date_time_object->createFromTimestamp(strtotime($paragraph_billing_information->get('field_start_date')->getValue()[0]['value']))->format('d/M/Y');
-						$end_date = $date_time_object->createFromTimestamp(strtotime($paragraph_billing_information->get('field_end_date')->getValue()[0]['value']))->format('d/M/Y');
-						$node[$i]['billing_information'][$key]['start_date'] = $start_date;
-						$node[$i]['billing_information'][$key]['end_date'] = $end_date;
-				}
-				else{
-						$node[$i]['billing_information'][$key]['start_date'] = 'No date given';
-						$node[$i]['billing_information'][$key]['end_date'] = 'No date given';					
-				}
-				if($uId == $node[$i]['billing_information'][$key]['user_name']){
-					$total_billable += $node[$i]['billing_information'][$key]['billable'];
-					$total_non_billable += $node[$i]['billing_information'][$key]['non_billable'];
-					$user_node_count++;
 				}
 
+				$paragraph_billing_information_array = $paragraph_member_details->get('field_billing_information')->getValue();
+				
+				if(!empty($paragraph_billing_information_array)){
+					foreach ($paragraph_billing_information_array as $key => $value) {
+						$paragraph_billing_information = Paragraph::load($value['target_id']);
+						$node[$i]['billing_information'][$key]['id'] = $value['target_id'];
+						$node[$i]['billing_information'][$key]['user_name'] = User::load($paragraph_billing_information->get('field_user_name')->getValue()[0]['target_id'])->getUsername();
+						$node[$i]['billing_information'][$key]['billable'] = $paragraph_billing_information->get('field_billable')->getValue()[0]['value'];
+						$node[$i]['billing_information'][$key]['non_billable'] = $paragraph_billing_information->get('field_non_billable')->getValue()[0]['value'];
+						$delete_url = Url::fromRoute('user.delete_paragraph',['pid'=>$value['target_id'] , 'uId' => $uId]);
+						$delete_url->setOptions($delete_link_options);
+						$node[$i]['billing_information'][$key]['delete_link'] = Link::fromTextAndUrl($delete_link_options['title'], $delete_url)->toString();
+						if(!empty($paragraph_billing_information->get('field_end_date')->getValue())){
+								$date_time_object = new DrupalDateTime();
+								$start_date = $date_time_object->createFromTimestamp(strtotime($paragraph_billing_information->get('field_start_date')->getValue()[0]['value']))->format('d/M/Y');
+								$end_date = $date_time_object->createFromTimestamp(strtotime($paragraph_billing_information->get('field_end_date')->getValue()[0]['value']))->format('d/M/Y');
+								$node[$i]['billing_information'][$key]['start_date'] = $start_date;
+								$node[$i]['billing_information'][$key]['end_date'] = $end_date;
+						}
+						else{
+								$node[$i]['billing_information'][$key]['start_date'] = $this->t('No date given');
+								$node[$i]['billing_information'][$key]['end_date'] = $this->t('No date given');					
+						}
+						if(User::load($uId)->getUsername() === $node[$i]['billing_information'][$key]['user_name']){
+							$total_billable += $node[$i]['billing_information'][$key]['billable'];
+							$total_non_billable += $node[$i]['billing_information'][$key]['non_billable'];
+							$user_node_count++;
+						}
+					}
+				}
 			}
 
 			$nId = $node_detail->get('nid')->getValue()[0]['value'];
 			$url = Url::fromRoute('user.data_entry',['uId'=>$uId , 'nid'=>$nId]);
-			$link_options['title'] = 'Edit Information';
+			$link_options['title'] = $this->t('Edit Information');
 			$url->setOptions($link_options);
 			$node[$i]['link'] = Link::fromTextAndUrl($link_options['title'], $url )->toString();
 			$i++;
 		}
 
 
-		$markup_nodes = $this->getMarkup($node);
-
+		$markup_nodes = '';
 
 		$markup_data =
 		"<div>Name : ".$name."</div>
@@ -203,56 +190,30 @@ class UserProjectInfo extends ControllerBase{
 
 		$markup_obj = Markup::create($markup_form.$markup_data.$markup_nodes);
 
+		$node['node_data'] = $node;
+
+		$node['user_specific_data'] = array(
+			'name' => $name,
+			'specialization' => $specialization_vals,
+			'total_billable' => ($total_billable/$user_node_count),
+			'total_non_billable' => ($total_non_billable/$user_node_count),
+			'link' => $link,
+		);
+
+		$node['form_data'] = $markup_form;
+
 		$build = array(
-			'#type' => 'markup',
-			'#markup' => $markup_obj,
+			'#theme' => 'block__user_project_info',
 			'#attached' => array(
 				'library' => array(
 					'resource_management/lib1'
 				),
 			),
+            '#nodes' => $node,
 		);	
 		return $build;
 	}
 
-	private function getMarkup($node_array){
-		$markup_nodes = '';
-		foreach ($node_array as $key => $node) {
-			$markup_nodes .= '<div class = "node" style="border:5px solid #390">';
-
-			$markup_nodes .= '<div>Project Name : '.$node['title'].'</div>';
-			$markup_nodes .= '<div class = "lead-member-group-wrapper">';				
-			if(!empty($node['lead'])){
-				foreach ($node['lead'] as $key1 => $lead) {
-					$markup_nodes .= '<div id = "lead-member-group-'.$node['lead_member_group_id'][$key1]['id'].'" style="border-top:1px solid #000;border-bottom:1px solid #000;">';				
-					$markup_nodes .= '<div> Lead : '.User::load($lead)->getUsername().'</div>';
-					foreach ($node['member'][$key1] as $key2 => $member) {
-						$markup_nodes .= '<div> Member : '.User::load($member)->getUsername().'</div>';
-					}
-					$markup_nodes .= '<div>'.$node['lead_member_group_id'][$key1]['delete_link'].'</div>';
-					$markup_nodes .= '</div>';
-				}
-			}
-			$markup_nodes .= '</div>';
-
-			$markup_nodes .= '<div class = "billing-information-group-wrapper" style="border:1px solid #000;">';				
-			foreach ($node['billing_information'] as $key => $billing_information) {
-				$markup_nodes .= '<div id = "billing-information-group-'.$billing_information['id'].'" style="border-top:1px solid #913;border-bottom:1px solid #713;" >';				
-				$markup_nodes .= '<div> User Name : '.User::load($billing_information['user_name'])->getUsername().'</div>';
-				$markup_nodes .= '<div> Billable : '.$billing_information['billable'].'%</div>';
-				$markup_nodes .= '<div> Non-Billable : '.$billing_information['non_billable'].'%</div>';
-				$markup_nodes .= '<div> Start Date : '.$billing_information['start_date'].'</div>';
-				$markup_nodes .= '<div> End Date : '.$billing_information['end_date'].'</div>';
-				$markup_nodes .= '<div>'.$billing_information['delete_link'].'</div>';
-				$markup_nodes .= '</div>';
-			}
-			$markup_nodes .= '</div>';
-			$markup_nodes .= $node['link'];
-			$markup_nodes .= '</div>';
-		}
-
-		return $markup_nodes;
-	}
 
 	public function delete($pid,$uId){
 		$paragraph_id = $pid;
@@ -287,6 +248,26 @@ class UserProjectInfo extends ControllerBase{
 		$paragraph->delete();
 
 		return $this->redirect('user.info',['uId' => $uId]);
+	}
+
+	private function load_term(&$val,$key){
+		$term =  \Drupal\taxonomy\Entity\Term::load($val);
+		$val = $term->get('name')->getValue()[0]['value'];
+	}
+
+	private function get_user_billing_information_paragraphs($uId){
+		$query = \Drupal::database()->select('paragraph__field_billing_information','b_info');
+		$query->fields('b_info', ['entity_id']);
+		$query->join('paragraph__field_user_name','uname','b_info.field_billing_information_target_id = uname.entity_id');
+		$query->condition('uname.field_user_name_target_id', $uId);
+		$rs = $query->execute();
+
+		$para_ids = array();
+		while ($row = $rs->fetchAssoc()) {
+			$para_ids[] = $row['entity_id'];
+		}
+
+		return $para_ids;
 	}
 
 }

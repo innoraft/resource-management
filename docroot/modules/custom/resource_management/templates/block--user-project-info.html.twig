@@ -1,0 +1,40 @@
+{{nodes.form_data | raw}}
+<div>Name : {{ nodes.user_specific_data.name }}</div>
+<div>Specialization : {{ nodes.user_specific_data.specialization }} </div>
+<div>Total billable : {{ nodes.user_specific_data.total_billable }}</div>
+<div>Total non-billable : {{ nodes.user_specific_data.total_non_billable }}</div>
+<div>{{ nodes.user_specific_data.link }}</div>
+  {% for node in nodes.node_data %}
+    <div class = "node" >
+      <div class = "lead-member-group-wrapper">
+        <div>{{ node.title }}</div>
+        {% for key1,lead in node.lead %}
+          {% set lead_member_group_id = 'lead-member-group-' ~ node.lead_member_group_id[key1].id %}
+          <div id = {{ lead_member_group_id }} class="lead-member-group">
+            <div>Lead : {{ lead }}</div>
+            {% for member_group in node.member %}
+              {% for member in member_group %}
+                <div>Member : {{ member }}</div>
+              {% endfor %}
+            {% endfor %}
+            {{node.lead_member_group_id[key1].delete_link}}
+          </div>
+        {% endfor %}
+      </div>
+      <div class = "billing-information-group-wrapper" style="">
+        {% for billing_information_group in node.billing_information %}
+          {% set billing_information_group_id = 'billing-information-group-' ~ billing_information_group.id %}
+          <div id = {{ billing_information_group_id }} class="billing-information-group">
+            <div>User name : {{ billing_information_group.user_name }}</div>
+            <div>Billable : {{ billing_information_group.billable }}%</div>
+            <div>Non-billable : {{ billing_information_group.non_billable }}%</div>
+            <div>Start date : {{ billing_information_group.start_date }}</div>
+            <div>End date : {{ billing_information_group.end_date }}</div>
+            <div>{{ billing_information_group.delete_link }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      {{ node.link }}
+    </div>
+  {% endfor %}
+</div>
