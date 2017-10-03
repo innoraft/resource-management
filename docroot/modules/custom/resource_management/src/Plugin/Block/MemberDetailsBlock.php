@@ -3,7 +3,6 @@
 namespace Drupal\resource_management\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Form\FormInterface;
 
 /**
  * Provides a block for filling out form for member details.
@@ -24,5 +23,6 @@ class MemberDetailsBlock extends BlockBase {
     $form = \Drupal::formBuilder()->getForm('Drupal\resource_management\Form\MemberDetailsForm');
 
     return $form;
-   }
+  }
+
 }

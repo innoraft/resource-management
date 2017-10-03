@@ -1,0 +1,28 @@
+user.info:
+  path: '/user_project_info/{uId}'
+  defaults:
+    _controller: '\Drupal\resource_management\Controller\UserProjectInfo::content'
+    _title: 'User Project Information'
+    uId: '0'
+  requirements:
+    _permission: 'access content'
+
+
+user.data_entry:
+  path: '/user_project_info/{uId}/form/{nid}'
+  defaults:
+    _form: '\Drupal\resource_management\Form\MemberDetailsForm'
+    nid: NULL
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+user.delete_paragraph:
+  path: '/user_project_info/delete/{pid}/{uId}'
+  defaults:
+    _controller: '\Drupal\resource_management\Controller\UserProjectInfo::delete'
+  requirements:
+    _permission: 'access content'

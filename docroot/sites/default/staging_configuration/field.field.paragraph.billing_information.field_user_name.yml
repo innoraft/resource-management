@@ -1,0 +1,28 @@
+uuid: 40939434-13ce-470a-895e-c89719359de4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_user_name
+    - paragraphs.paragraphs_type.billing_information
+id: paragraph.billing_information.field_user_name
+field_name: field_user_name
+entity_type: paragraph
+bundle: billing_information
+label: 'User Name'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: _none
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: entity_reference

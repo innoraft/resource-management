@@ -1,0 +1,25 @@
+uuid: 4c107ac9-e659-49f7-a5dc-7ac0e6f74c40
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_non_billable
+    - paragraphs.paragraphs_type.billing_information
+id: paragraph.billing_information.field_non_billable
+field_name: field_non_billable
+entity_type: paragraph
+bundle: billing_information
+label: Non-Billable
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: !!float 0
+default_value_callback: ''
+settings:
+  min: !!float 0
+  max: null
+  prefix: ''
+  suffix: '%'
+field_type: decimal

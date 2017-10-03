@@ -1,0 +1,39 @@
+uuid: 93f49182-e024-45c0-9c8c-4552fc5f64bd
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_billing_information
+    - paragraphs.paragraphs_type.billing_information
+    - paragraphs.paragraphs_type.member_details
+  module:
+    - entity_reference_revisions
+id: paragraph.member_details.field_billing_information
+field_name: field_billing_information
+entity_type: paragraph
+bundle: member_details
+label: 'Billing Information'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      billing_information: billing_information
+    target_bundles_drag_drop:
+      billing_information:
+        enabled: true
+        weight: 5
+      lead_and_member:
+        weight: 6
+        enabled: false
+      member_details:
+        weight: 7
+        enabled: false
+      specification:
+        weight: 8
+        enabled: false
+field_type: entity_reference_revisions

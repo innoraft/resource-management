@@ -1,0 +1,21 @@
+uuid: 9755d191-e1bd-402a-aef7-d7f9979d760c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_end_date
+    - paragraphs.paragraphs_type.billing_information
+  module:
+    - datetime
+id: paragraph.billing_information.field_end_date
+field_name: field_end_date
+entity_type: paragraph
+bundle: billing_information
+label: 'End Date'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

@@ -1,0 +1,67 @@
+uuid: 4424d75f-0269-4d87-b1e8-f6a5493c1b66
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.billing_information.field_billable
+    - field.field.paragraph.billing_information.field_end_date
+    - field.field.paragraph.billing_information.field_non_billable
+    - field.field.paragraph.billing_information.field_start_date
+    - field.field.paragraph.billing_information.field_user_name
+    - paragraphs.paragraphs_type.billing_information
+  module:
+    - datetime
+id: paragraph.billing_information.default
+targetEntityType: paragraph
+bundle: billing_information
+mode: default
+content:
+  field_billable:
+    weight: 3
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    type: number_decimal
+    region: content
+  field_end_date:
+    weight: 2
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_non_billable:
+    weight: 4
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    type: number_decimal
+    region: content
+  field_start_date:
+    weight: 1
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_user_name:
+    weight: 0
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+hidden: {  }

@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * This is the module for for getting user project info and billing info.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function resource_management_theme() {
+  return [
+    'block__user_project_info' => [
+      'variables' => [
+        'nodes' => [],
+      ],
+    ],
+  ];
+}
