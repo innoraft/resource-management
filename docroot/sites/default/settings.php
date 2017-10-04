@@ -295,7 +295,7 @@ $config_directories = array();
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = 'XwRfyvFcRrWe_Tc0JmDwaja29qimP3UYfzmO88qrWU8NLTJEizSBqI3JtmndYhAR42nW3horIg';
+$settings['hash_salt'] = 'kRTtMrodkuwomattQlieFPQp3fyYHqsohbCP-9gbkbaTgxhWuh0ozrk8VOC28MAYApK_TfZX0Q';
 
 /**
  * Deployment identifier.
@@ -766,3 +766,4 @@ if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
 
 $settings['install_profile'] = 'standard';
 $config_directories['sync'] = 'sites/default/staging_configuration';
+
